@@ -81,7 +81,15 @@ class CustomRenderer(LaTeXRenderer):
                     '\\end{{document}}\n')
 
         basename = os.path.splitext(os.path.basename(self.path))[0]
-        title = basename.replace('-', ' ').replace('_', ' ').title()
+        parts = basename.split('(')
+        if len(parts) == 2:
+            title = parts[0][:-1]
+            date = parts[1][:-1]
+        else:
+            title = parts[0]
+            date = datetime.today().strftime(DATE_FORMAT)
+
+        title = title.replace('-', ' ').replace('_', ' ').title()
 
         bibpath = newext(self.path, '.bib')
         if os.path.isfile(bibpath):
@@ -98,7 +106,7 @@ class CustomRenderer(LaTeXRenderer):
                                setupbib=setupbib,
                                title=title,
                                author=AUTHOR,
-                               date=datetime.today().strftime(DATE_FORMAT),
+                               date=date,
                                inner=self.render_inner(token),
                                printbib=printbib)
 
