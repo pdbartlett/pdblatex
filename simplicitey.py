@@ -94,7 +94,7 @@ class CustomRenderer(LaTeXRenderer):
         bibpath = newext(self.path, '.bib')
         if os.path.isfile(bibpath):
             setupbib = ('\\usepackage[style=authoryear-ibid,backend=biber]{biblatex}\n'
-                        '\\addbibresource{' + bibpath + '}\n')
+                        '\\addbibresource{"' + bibpath + '"}\n')
             printbib = '\\printbibliography\n'
         else:
             setupbib = ''
