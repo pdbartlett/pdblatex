@@ -9,13 +9,15 @@ from datetime import datetime
 import mistletoe
 from mistletoe import Document
 from mistletoe.latex_renderer import LaTeXRenderer
-from mistletoe.span_token import SpanToken
+
+from tokens import ParenCite, TextCite
 
 # Constants for use in output document.
 AUTHOR='Sophie Bartlett'
 DATE_FORMAT='%d %B %Y'
 DOCOPTS='11pt,a4paper'
 DOCTYPE='article'
+PAREN_DATE_RE = re.compile(r'(.*) \((.*)\)')
 
 def main(args):
     for filename in args:
@@ -37,18 +39,6 @@ def newext(filename, ext):
     if filename[-3:] == '.md':
         return filename[:-3] + ext
     return filename + ext
-
-
-class ParenCite(SpanToken):
-    pattern = re.compile(r" \(([A-Z][A-Za-z]+[0-9]{4})\)")
-    def __init__(self, match_obj):
-        self.citekey = match_obj.group(1)
-
-
-class TextCite(SpanToken):
-    pattern = re.compile(r" ([A-Z][A-Za-z]+[0-9]{4})")
-    def __init__(self, match_obj):
-        self.citekey = match_obj.group(1)
 
 
 class CustomRenderer(LaTeXRenderer):
@@ -81,15 +71,13 @@ class CustomRenderer(LaTeXRenderer):
                     '\\end{{document}}\n')
 
         basename = os.path.splitext(os.path.basename(self.path))[0]
-        parts = basename.split('(')
-        if len(parts) == 2:
-            title = parts[0][:-1]
-            date = parts[1][:-1]
+        title = basename.replace('-', ' ').replace('_', ' ')
+        match = PAREN_DATE_RE.match(title)
+        if match:
+            title = match.group(1)
+            date = match.group(2)
         else:
-            title = parts[0]
             date = datetime.today().strftime(DATE_FORMAT)
-
-        title = title.replace('-', ' ').replace('_', ' ').title()
 
         bibpath = newext(os.path.basename(self.path), '.bib')
         if os.path.isfile(bibpath):
@@ -104,7 +92,7 @@ class CustomRenderer(LaTeXRenderer):
                                docopts=DOCOPTS,
                                packages=self.render_packages(),
                                setupbib=setupbib,
-                               title=title,
+                               title=title.title(),
                                author=AUTHOR,
                                date=date,
                                inner=self.render_inner(token),
