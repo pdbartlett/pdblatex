@@ -143,6 +143,10 @@ class IdiomaticRenderer(CitationRenderer):
             level = 'subsubsection'
         return '\n\\{level}{{{inner}}}\n'.format(level=level, inner=inner)
 
+    @staticmethod
+    def render_thematic_break(token):
+        return '\\pagebreak\n'
+
     def render_doc_meta_data(self, token):
         self.metadata[token.key] = token.val
         return ''
