@@ -4,16 +4,19 @@ import re
 from mistletoe.span_token import SpanToken
 
 
-__all__ = ['ParencCite', 'TextCite']
-
-
 class ParenCite(SpanToken):
-    pattern = re.compile(r" \(([A-Z][A-Za-z]+[0-9]{4})\)")
+    pattern = re.compile(r'\s\(([A-Z][A-Za-z]+[0-9]{4})\)')
     parse_inner = False
-    parse_group = 1
 
 
 class TextCite(SpanToken):
-    pattern = re.compile(r" ([A-Z][A-Za-z]+[0-9]{4})")
+    pattern = re.compile(r'\s([A-Z][A-Za-z]+[0-9]{4})')
     parse_inner = False
-    parse_group = 1
+
+
+class DocMetaData(SpanToken):
+    pattern = re.compile(r'(Author|Date|Doctype|Docopts)\s*:\s*\[(.*)\]')
+    parse_inner = False
+    def __init__(self, match):
+        self.key = match.group(1)
+        self.val = match.group(2)

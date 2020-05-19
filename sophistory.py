@@ -1,10 +1,10 @@
 import sys
 
-from renderers import CitationRenderer, render
+from renderers import IdiomaticRenderer, render
 
 def main(args):
     for filename in args:
-        with CitationRenderer(filename) as renderer:
+        with IdiomaticRenderer(filename) as renderer:
             render(filename, renderer)
 
 if __name__ == "__main__":
