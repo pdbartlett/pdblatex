@@ -1,7 +1,9 @@
 # Example Document
-Author: [Paul D. Bartlett]
-Date: [April 1, 2020]
-Docopts: [titlepage]
+[Author: Paul D. Bartlett]
+[Date: April 1, 2020]
+[Docopts: titlepage]
+
+[TOC]
 
 ## Introduction
 
@@ -39,9 +41,11 @@ full equations:
 
 $$ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$
 
-# Appendices
+[BIBLIO]
 
 ---
+
+# Appendices
 
 ## First appendix
 

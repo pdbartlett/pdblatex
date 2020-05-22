@@ -11,7 +11,7 @@ import mistletoe
 from mistletoe import Document
 from mistletoe.latex_renderer import LaTeXRenderer
 
-from tokens import ParenCite, TextCite, DocMetaData
+from tokens import ParenCite, TextCite, DocMetaData, SpecialSection
 
 AUTHOR='Sophie Bartlett'
 DATE_FORMAT='%d %B %Y'
@@ -70,22 +70,19 @@ class CitationRenderer(LaTeXRenderer):
                     '\\begin{{document}}\n'
                     '\\maketitle\n'
                     '{inner}'
-                    '{printbib}'
                     '\\end{{document}}\n')
 
         doctype, docopts = self.get_doctype_data()
         title, author, date = self.get_doc_metadata()
-        setupbib, printbib = self.get_bib_data()
 
         return template.format(doctype=doctype,
                                docopts=docopts,
                                packages=self.render_packages(),
-                               setupbib=setupbib,
+                               setupbib=self.get_bib_setup(),
                                title=title,
                                author=author,
                                date=date,
-                               inner=inner,
-                               printbib=printbib)
+                               inner=inner)
 
     def get_doctype_data(self):
         return (DOCTYPE, DOCOPTS)
@@ -102,18 +99,11 @@ class CitationRenderer(LaTeXRenderer):
 
         return (title.title(), AUTHOR, date)
 
-    def get_bib_path(self):
+    def get_bib_setup(self):
         bibpath = newext(os.path.basename(self.path), '.bib')
-        return bibpath if os.path.isfile(bibpath) else ''
-
-    def get_bib_data(self):
-        bibpath = self.get_bib_path()
-        if not bibpath:
-            return ('', '')
-
-        setupbib = '\\addbibresource{"' + bibpath + '"}\n'
-        printbib = '\\printbibliography\n'
-        return (setupbib, printbib)
+        if not os.path.isfile(bibpath):
+            return ''
+        return '\\addbibresource{"' + bibpath + '"}\n'
 
 
 class IdiomaticRenderer(CitationRenderer):
@@ -121,19 +111,15 @@ class IdiomaticRenderer(CitationRenderer):
         self.title = ''
         self.metadata = {}
         self.has_appendix = False
-        super().__init__(path, DocMetaData)
+        super().__init__(path, DocMetaData, SpecialSection)
 
     def render_heading(self, token):
         inner = self.render_inner(token)
         if token.level == 1:
             if self.title:
-                self.has_appendix = True
-                if self.get_bib_path():
-                    return '\n\\printbibliography\n\\appendix\n'
                 return '\n\\appendix\n'
-            else:
-                self.title = inner
-                return ''
+            self.title = inner
+            return ''
         # TODO make levels doctype-dependent
         elif token.level == 2:
             level = 'section'
@@ -151,6 +137,17 @@ class IdiomaticRenderer(CitationRenderer):
         self.metadata[token.key] = token.val
         return ''
 
+    @staticmethod
+    def render_special_section(token):
+        if token.content == 'BIBLIO':
+            return '\\printbibliography\n'
+        if token.content == 'FIGURES':
+            return '\\listoffigures\n'
+        if token.content == 'TABLES':
+            return '\\listoftables\n'
+        if token.content == 'TOC':
+            return '\\tableofcontents\n'
+
     def get_doctype_data(self):
         doctype, docopts = super().get_doctype_data()
         return (self.metadata.get('Doctype', doctype),
@@ -161,7 +158,3 @@ class IdiomaticRenderer(CitationRenderer):
         return (self.title or title,
                 self.metadata.get('Author', author),
                 self.metadata.get('Date', date))
-
-    def get_bib_data(self):
-        setupbib, printbib = super().get_bib_data()
-        return (setupbib, '' if self.has_appendix else printbib)
