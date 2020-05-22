@@ -63,13 +63,14 @@ class CitationRenderer(LaTeXRenderer):
 
         template = ('\\documentclass[{docopts}]{{{doctype}}}\n'
                     '{packages}'
-                    '{setupbib}'
+                    '{preamble}'
                     '\\title{{{title}}}\n'
                     '\\author{{{author}}}\n'
                     '\\date{{{date}}}\n'
                     '\\begin{{document}}\n'
                     '\\maketitle\n'
                     '{inner}'
+                    '{postamble}'
                     '\\end{{document}}\n')
 
         doctype, docopts = self.get_doctype_data()
@@ -78,11 +79,12 @@ class CitationRenderer(LaTeXRenderer):
         return template.format(doctype=doctype,
                                docopts=docopts,
                                packages=self.render_packages(),
-                               setupbib=self.get_bib_setup(),
+                               preamble=self.get_preamble(),
                                title=title,
                                author=author,
                                date=date,
-                               inner=inner)
+                               inner=inner,
+                               postamble=self.get_postamble())
 
     def get_doctype_data(self):
         return (DOCTYPE, DOCOPTS)
@@ -99,18 +101,27 @@ class CitationRenderer(LaTeXRenderer):
 
         return (title.title(), AUTHOR, date)
 
-    def get_bib_setup(self):
+    def get_bib_path(self):
         bibpath = newext(os.path.basename(self.path), '.bib')
-        if not os.path.isfile(bibpath):
+        return bibpath if os.path.isfile(bibpath) else ''
+
+    def get_preamble(self):
+        bibpath = self.get_bib_path()
+        if not bibpath:
             return ''
         return '\\addbibresource{"' + bibpath + '"}\n'
+
+    def get_postamble(self):
+        if not self.get_bib_path():
+            return ''
+        return '\\printbibliography\n'
 
 
 class IdiomaticRenderer(CitationRenderer):
     def __init__(self, path):
         self.title = ''
         self.metadata = {}
-        self.has_appendix = False
+        self.bib_printed = False
         super().__init__(path, DocMetaData, SpecialSection)
 
     def render_heading(self, token):
@@ -137,9 +148,9 @@ class IdiomaticRenderer(CitationRenderer):
         self.metadata[token.key] = token.val
         return ''
 
-    @staticmethod
-    def render_special_section(token):
+    def render_special_section(self, token):
         if token.content == 'BIBLIO':
+            self.bib_printed = True
             return '\\printbibliography\n'
         if token.content == 'FIGURES':
             return '\\listoffigures\n'
@@ -158,3 +169,6 @@ class IdiomaticRenderer(CitationRenderer):
         return (self.title or title,
                 self.metadata.get('Author', author),
                 self.metadata.get('Date', date))
+
+    def get_postamble(self):
+        return '' if self.bib_printed else super().get_postamble()
