@@ -1,7 +1,6 @@
 # Example Document
 [Author: Paul D. Bartlett]
 [Date: April 1, 2020]
-[Docopts: titlepage]
 
 [TOC]
 

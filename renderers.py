@@ -15,9 +15,11 @@ from tokens import ParenCite, TextCite, DocMetaData, SpecialSection
 
 AUTHOR='Sophie Bartlett'
 DATE_FORMAT='%d %B %Y'
+DOCLEVELS=['part', 'chapter', 'section', 'subsection', 'subsubsection']
 DOCOPTS='11pt,a4paper'
 DOCTYPE='article'
-PAREN_DATE_RE = re.compile(r'(.*) \((.*)\)')
+H2_LEVEL='2'
+PAREN_DATE_RE=re.compile(r'(.*) \((.*)\)')
 
 def render(filename, renderer):
     try:
@@ -131,14 +133,14 @@ class IdiomaticRenderer(CitationRenderer):
                 return '\n\\appendix\n'
             self.title = inner
             return ''
-        # TODO make levels doctype-dependent
-        elif token.level == 2:
-            level = 'section'
-        elif token.level == 3:
-            level = 'subsection'
+
+        h2_level = int(self.metadata.get('H2Level', H2_LEVEL))
+        level = token.level + h2_level - 2
+        if level >= 0 and level < len(DOCLEVELS):
+            command = DOCLEVELS[level]
         else:
-            level = 'subsubsection'
-        return '\n\\{level}{{{inner}}}\n'.format(level=level, inner=inner)
+            command = 'subsubsection'
+        return '\n\\{command}{{{inner}}}\n'.format(command=command, inner=inner)
 
     @staticmethod
     def render_thematic_break(token):
