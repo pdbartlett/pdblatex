@@ -11,7 +11,7 @@ import mistletoe
 from mistletoe import Document
 from mistletoe.latex_renderer import LaTeXRenderer
 
-from tokens import ParenCite, TextCite, DocMetaData, SpecialSection
+from tokens import ParenCite, TextCite, DocMetaData, DoubleQuote, SpecialSection
 
 AUTHOR='Sophie Bartlett'
 DATE_FORMAT='%d %B %Y'
@@ -124,7 +124,8 @@ class IdiomaticRenderer(CitationRenderer):
         self.title = ''
         self.metadata = {}
         self.bib_printed = False
-        super().__init__(path, DocMetaData, SpecialSection)
+        self.quote_open = False
+        super().__init__(path, DocMetaData, DoubleQuote, SpecialSection)
 
     def render_heading(self, token):
         inner = self.render_inner(token)
@@ -149,6 +150,10 @@ class IdiomaticRenderer(CitationRenderer):
     def render_doc_meta_data(self, token):
         self.metadata[token.key] = token.val
         return ''
+
+    def render_double_quote(self, token):
+        self.quote_open = not self.quote_open
+        return '``' if self.quote_open else "''"
 
     def render_special_section(self, token):
         if token.content == 'BIBLIO':

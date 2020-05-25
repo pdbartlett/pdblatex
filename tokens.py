@@ -22,6 +22,11 @@ class DocMetaData(SpanToken):
         self.val = match.group(2)
 
 
+class DoubleQuote(SpanToken):
+    pattern = re.compile(r'(")')
+    parse_inner = False
+
+
 class SpecialSection(SpanToken):
     pattern = re.compile(r'\[(BIBLIO|FIGURES|TABLES|TOC)\]')
     parse_inner = False

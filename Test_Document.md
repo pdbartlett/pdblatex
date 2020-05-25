@@ -31,8 +31,8 @@ guessed it---some more waffle!):
 
 It also allowed footnotes, but they don't convert to LaTeX with the default
 renderer. I'll try to make them work, but will definitely add custom syntax for
-full citation/reference support, both parenthetical (Jones2000) and inline, like
-Smith2001.
+full citation/reference support, both `parenthetical citations' (Jones2000), and
+"inline ones" as used by Smith2001.
 
 There is also support for LaTeX mathematical formatting, e.g. $y=mx+c$, though
 that is probably not of much use for history essays! Even less useful would be
