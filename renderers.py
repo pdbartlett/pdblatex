@@ -129,18 +129,31 @@ class IdiomaticRenderer(CitationRenderer):
 
     def render_heading(self, token):
         inner = self.render_inner(token)
+
+        if inner.lower() == "frontmatter":
+            return '\n\\thispagestyle{empty}\n\\frontmatter\n'
+
+        if inner.lower() == "mainmatter":
+            return '\n\\mainmatter\n'
+
+        if inner.lower() == "backmatter":
+            return '\n\\backmatter\n'
+
+        if inner.lower() == "appendix" or inner.lower() == "appendices":
+            return '\n\\appendix\n'
+
         if token.level == 1:
-            if self.title:
-                return '\n\\appendix\n'
-            self.title = inner
+            self.title = self.title or inner
             return ''
 
         h2_level = int(self.metadata.get('H2Level', H2_LEVEL))
         level = token.level + h2_level - 2
-        if level >= 0 and level < len(DOCLEVELS):
+        if level < 0:
+            command = DOCLEVELS[0]
+        elif level >= 0 and level < len(DOCLEVELS):
             command = DOCLEVELS[level]
         else:
-            command = 'subsubsection'
+            command = DOCLEVELS[-1]
         return '\n\\{command}{{{inner}}}\n'.format(command=command, inner=inner)
 
     @staticmethod
@@ -176,6 +189,14 @@ class IdiomaticRenderer(CitationRenderer):
         return (self.title or title,
                 self.metadata.get('Author', author),
                 self.metadata.get('Date', date))
+
+    def get_preamble(self):
+        preamble = super().get_preamble()
+        if 'SecNumDepth' in self.metadata:
+            preamble += '\\setcounter{secnumdepth}{' + self.metadata['SecNumDepth'] + '}\n'
+        if 'TocDepth' in self.metadata:
+            preamble += '\\setcounter{tocdepth}{' + self.metadata['TocDepth'] + '}\n'
+        return preamble
 
     def get_postamble(self):
         return '' if self.bib_printed else super().get_postamble()
