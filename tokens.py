@@ -28,6 +28,23 @@ class DoubleQuote(SpanToken):
     parse_inner = False
 
 
+class MixedFraction(SpanToken):
+    pattern = re.compile(r'(\d+)\s([13])/([24])')
+    parse_inner = False
+    def __init__(self, match):
+        self.whole = match.group(1)
+        self.numer = match.group(2)
+        self.denom = match.group(3)
+
+
+class SimpleFraction(SpanToken):
+    pattern = re.compile(r'(?<!\d\s)([13])/([24])')
+    parse_inner = False
+    def __init__(self, match):
+        self.numer = match.group(1)
+        self.denom = match.group(2)
+
+
 class SpecialSection(SpanToken):
     pattern = re.compile(r'\[(BIBLIO|FIGURES|TABLES|TOC)\]')
     parse_inner = False

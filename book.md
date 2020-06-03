@@ -27,7 +27,7 @@ Mistletoe and LaTeX.
 
 * 250g plain flour
 * 125ml water
-* 2.5 tbsp oil
+* 2 1/2 tbsp oil
 * pinch of salt
 
 ##### Method
