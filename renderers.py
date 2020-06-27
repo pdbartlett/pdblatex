@@ -1,3 +1,4 @@
+import logging
 import os
 import os.path
 import re
@@ -25,6 +26,7 @@ PAREN_DATE_RE=re.compile(r'(.*) \((.*)\)')
 class CitationRenderer(LaTeXRenderer):
     def __init__(self, path, *extras):
         self.path = path
+        self.logger = logging.getLogger(__name__)
         super().__init__(*chain([ParenCite, TextCite], extras))
 
     def render_file(self):
@@ -144,7 +146,10 @@ class IdiomaticRenderer(CitationRenderer):
             return '\n\\appendix\n'
 
         if token.level == 1:
-            self.title = self.title or inner
+            if self.title:
+                self.logger.warning("Multiple top-level headings; ignoring all but first")
+            else:
+                self.title = inner
             return ''
 
         h2_level = int(self.metadata.get('H2Level', H2_LEVEL))
