@@ -21,27 +21,22 @@ DOCTYPE='article'
 H2_LEVEL='2'
 PAREN_DATE_RE=re.compile(r'(.*) \((.*)\)')
 
-def render(filename, renderer):
-    try:
-        with open(filename, 'r') as fin:
-            rendered = renderer.render(Document(fin))
-        outfile = newext(filename, '.tex')
-        with open(outfile, 'w') as fout:
-            fout.write(rendered)
-        subprocess.run(['latexmk', '-pdf', outfile])
-    except OSError as err:
-        sys.exit('Problem processing "' + filename + '": ' + str(err))
-
-def newext(filename, ext):
-    if filename[-3:] == '.md':
-        return filename[:-3] + ext
-    return filename + ext
-
 
 class CitationRenderer(LaTeXRenderer):
     def __init__(self, path, *extras):
         self.path = path
         super().__init__(*chain([ParenCite, TextCite], extras))
+
+    def render_file(self, filename):
+        try:
+            with open(filename, 'r') as fin:
+                rendered = self.render(Document(fin))
+            outfile = self.newext(filename, '.tex')
+            with open(outfile, 'w') as fout:
+                fout.write(rendered)
+            subprocess.run(['latexmk', '-pdf', outfile])
+        except OSError as err:
+            sys.exit('Problem processing "' + filename + '": ' + str(err))
 
     def render_paren_cite(self, token):
         return self.cite_helper('parencite', token)
@@ -104,7 +99,7 @@ class CitationRenderer(LaTeXRenderer):
         return (title.title(), AUTHOR, date)
 
     def get_bib_path(self):
-        bibpath = newext(os.path.basename(self.path), '.bib')
+        bibpath = self.newext(os.path.basename(self.path), '.bib')
         return bibpath if os.path.isfile(bibpath) else ''
 
     def get_preamble(self):
@@ -117,6 +112,12 @@ class CitationRenderer(LaTeXRenderer):
         if not self.get_bib_path():
             return ''
         return '\\printbibliography\n'
+
+    @staticmethod
+    def newext(filename, ext):
+        if filename[-3:] == '.md':
+            return filename[:-3] + ext
+        return filename + ext
 
 
 class IdiomaticRenderer(CitationRenderer):
