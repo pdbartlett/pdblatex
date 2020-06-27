@@ -40,6 +40,22 @@ full equations:
 
 $$ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$
 
+Another less than obvious feature is `code fences`, but we (ab)use them to allow
+the inclusion of literal [[\LaTeX{}]] code:
+
+```preambleLaTeX
+\usepackage{amsmath}
+```
+
+```inlineLaTeX
+\begin{align}
+\nabla \cdot \mathbf{D} &= \rho\\
+\nabla \cdot \mathbf{B} &= 0\\
+\nabla \times \mathbf{E} &= -\frac{\partial \mathbf{B}} {\partial t}\\
+\nabla \times \mathbf{H} &= \mathbf{J} + \frac{\partial \mathbf{D}} {\partial t}
+\end{align}
+```
+
 [BIBLIO]
 
 ---

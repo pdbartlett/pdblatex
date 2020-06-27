@@ -125,6 +125,7 @@ class CitationRenderer(LaTeXRenderer):
 class IdiomaticRenderer(CitationRenderer):
     def __init__(self, path):
         self.title = ''
+        self.preamble = ''
         self.metadata = {}
         self.bib_printed = False
         self.quote_open = False
@@ -178,6 +179,14 @@ class IdiomaticRenderer(CitationRenderer):
     def render_latex_literal(token):
         return token.content
 
+    def render_block_code(self, token):
+        if token.language.lower() == 'inlinelatex':
+            return self.render_raw_text(token.children[0], False)
+        if token.language.lower() == 'preamblelatex':
+            self.preamble += self.render_raw_text(token.children[0], False)
+            return ''
+        return super().render_block_code(token)
+
     @staticmethod
     def render_mixed_fraction(token):
         return '${z}\\frac{{{n}}}{{{d}}}$'.format(z=token.whole, n=token.numer, d=token.denom)
@@ -209,7 +218,7 @@ class IdiomaticRenderer(CitationRenderer):
                 self.metadata.get('Date', date))
 
     def get_preamble(self):
-        preamble = super().get_preamble()
+        preamble = super().get_preamble() + self.preamble
         if 'SecNumDepth' in self.metadata:
             preamble += '\\setcounter{secnumdepth}{' + self.metadata['SecNumDepth'] + '}\n'
         if 'TocDepth' in self.metadata:
