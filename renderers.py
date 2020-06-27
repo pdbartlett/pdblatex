@@ -12,7 +12,7 @@ import mistletoe
 from mistletoe import Document
 from mistletoe.latex_renderer import LaTeXRenderer
 
-from tokens import ParenCite, TextCite, DocMetaData, DoubleQuote, MixedFraction, SimpleFraction, SpecialSection
+from tokens import ParenCite, TextCite, DocMetaData, DoubleQuote, LatexLiteral, MixedFraction, SimpleFraction, SpecialSection
 
 AUTHOR='Sophie Bartlett'
 DATE_FORMAT='%d %B %Y'
@@ -128,7 +128,7 @@ class IdiomaticRenderer(CitationRenderer):
         self.metadata = {}
         self.bib_printed = False
         self.quote_open = False
-        super().__init__(path, DocMetaData, DoubleQuote, MixedFraction, SimpleFraction, SpecialSection)
+        super().__init__(path, DocMetaData, DoubleQuote, LatexLiteral, MixedFraction, SimpleFraction, SpecialSection)
 
     def render_heading(self, token):
         inner = self.render_inner(token)
@@ -173,6 +173,10 @@ class IdiomaticRenderer(CitationRenderer):
     def render_double_quote(self, token):
         self.quote_open = not self.quote_open
         return '``' if self.quote_open else "''"
+
+    @staticmethod
+    def render_latex_literal(token):
+        return token.content
 
     @staticmethod
     def render_mixed_fraction(token):

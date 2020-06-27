@@ -28,6 +28,11 @@ class DoubleQuote(SpanToken):
     parse_inner = False
 
 
+class LatexLiteral(SpanToken):
+    pattern = re.compile(r'\[\[(.*)\]\]')
+    parse_inner = False
+
+
 class MixedFraction(SpanToken):
     pattern = re.compile(r'(\d+)\s([13])/([24])')
     parse_inner = False

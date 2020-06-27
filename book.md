@@ -13,7 +13,7 @@
 ### Introduction
 
 This is a simple example of using Markdown to create a book via Sophistory,
-Mistletoe and LaTeX.
+Mistletoe and [[\LaTeX{}]].
 
 # Mainmatter
 
