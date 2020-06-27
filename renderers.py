@@ -27,16 +27,16 @@ class CitationRenderer(LaTeXRenderer):
         self.path = path
         super().__init__(*chain([ParenCite, TextCite], extras))
 
-    def render_file(self, filename):
+    def render_file(self):
         try:
-            with open(filename, 'r') as fin:
+            with open(self.path, 'r') as fin:
                 rendered = self.render(Document(fin))
-            outfile = self.newext(filename, '.tex')
+            outfile = self.newext(self.path, '.tex')
             with open(outfile, 'w') as fout:
                 fout.write(rendered)
             subprocess.run(['latexmk', '-pdf', outfile])
         except OSError as err:
-            sys.exit('Problem processing "' + filename + '": ' + str(err))
+            sys.exit('Problem processing "' + self.path + '": ' + str(err))
 
     def render_paren_cite(self, token):
         return self.cite_helper('parencite', token)
