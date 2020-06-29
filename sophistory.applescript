@@ -4,7 +4,7 @@ on run {input}
 	end tell
 	set thePath to POSIX path of input
 	set cmd to "cd " & quoted form of theDir & "; "
-	set cmd to cmd & "python3 ~/src/misc/python/pdblatex/sophistory.py " & quoted form of thePath
+	set cmd to cmd & "python3 ~/src/pdblatex/sophistory.py " & quoted form of thePath
 	tell application "System Events" to set terminalIsRunning to exists application process "Terminal"
 	tell application "Terminal"
 		activate
