@@ -12,7 +12,9 @@ import mistletoe
 from mistletoe import Document
 from mistletoe.latex_renderer import LaTeXRenderer
 
-from tokens import ParenCite, TextCite, DocMetaData, DoubleQuote, LatexLiteral, MixedFraction, SimpleFraction, SpecialSection
+from tokens import (ParenCite, TextCite, DocMetaData, DoubleQuote, LatexLiteral,
+                    LatexPackageSimple, MixedFraction, SimpleFraction,
+                    SpecialSection)
 
 AUTHOR='Sophie Bartlett'
 DATE_FORMAT='%d %B %Y'
@@ -129,7 +131,8 @@ class IdiomaticRenderer(CitationRenderer):
         self.metadata = {}
         self.bib_printed = False
         self.quote_open = False
-        super().__init__(path, DocMetaData, DoubleQuote, LatexLiteral, MixedFraction, SimpleFraction, SpecialSection)
+        super().__init__(path, DocMetaData, DoubleQuote, LatexLiteral,
+            LatexPackageSimple, MixedFraction, SimpleFraction, SpecialSection)
 
     def render_heading(self, token):
         inner = self.render_inner(token)
@@ -148,7 +151,8 @@ class IdiomaticRenderer(CitationRenderer):
 
         if token.level == 1:
             if self.title:
-                self.logger.warning("Multiple top-level headings; ignoring all but first")
+                self.logger.warning(
+                    "Multiple top-level headings; ignoring all but first")
             else:
                 self.title = inner
             return ''
@@ -179,6 +183,10 @@ class IdiomaticRenderer(CitationRenderer):
     def render_latex_literal(token):
         return token.content
 
+    def render_latex_package_simple(self, token):
+        self.packages[token.content] = ''
+        return ''
+
     def render_block_code(self, token):
         if token.language.lower() == 'inlinelatex':
             return self.render_raw_text(token.children[0], False)
@@ -189,7 +197,8 @@ class IdiomaticRenderer(CitationRenderer):
 
     @staticmethod
     def render_mixed_fraction(token):
-        return '${z}\\frac{{{n}}}{{{d}}}$'.format(z=token.whole, n=token.numer, d=token.denom)
+        return '${z}\\frac{{{n}}}{{{d}}}$'.format(z=token.whole,
+                                                  n=token.numer, d=token.denom)
 
     @staticmethod
     def render_simple_fraction(token):

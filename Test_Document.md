@@ -1,6 +1,7 @@
 # Example Document
 [Author: Paul D. Bartlett]
 [Date: April 1, 2020]
+[Package: amsmath]
 
 [TOC]
 
@@ -42,10 +43,6 @@ $$ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$
 
 Another less than obvious feature is `code fences`, but we (ab)use them to allow
 the inclusion of literal [[\LaTeX{}]] code:
-
-```preambleLaTeX
-\usepackage{amsmath}
-```
 
 ```inlineLaTeX
 \begin{align}

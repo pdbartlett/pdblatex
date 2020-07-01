@@ -33,6 +33,12 @@ class LatexLiteral(SpanToken):
     parse_inner = False
 
 
+class LatexPackageSimple(SpanToken):
+    pattern = re.compile(
+        r'\[Package\s*:\s*([^()]+)]')
+    parse_inner = False
+
+
 class MixedFraction(SpanToken):
     pattern = re.compile(r'(\d+)\s([13])/([24])')
     parse_inner = False
