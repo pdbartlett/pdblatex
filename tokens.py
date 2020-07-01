@@ -34,9 +34,16 @@ class LatexLiteral(SpanToken):
 
 
 class LatexPackageSimple(SpanToken):
-    pattern = re.compile(
-        r'\[Package\s*:\s*([^()]+)]')
+    pattern = re.compile(r'\[Package\s*:\s*([^()\[\]]+)]')
     parse_inner = False
+
+
+class LatexPackageWithOptions(SpanToken):
+    pattern = re.compile(r'\[Package\s*:\s*([^\[\]]+)\(([^\[\]]+)\)]')
+    parse_inner = False
+    def __init__(self, match):
+        self.pkg_name = match.group(1)
+        self.pkg_opts = match.group(2)
 
 
 class MixedFraction(SpanToken):
