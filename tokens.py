@@ -64,5 +64,5 @@ class SimpleFraction(SpanToken):
 
 
 class SpecialSection(SpanToken):
-    pattern = re.compile(r'\[(BIBLIO|FIGURES|TABLES|TOC)\]')
+    pattern = re.compile(r'\[(BIBLIO|FIGURES|INDEX|TABLES|TOC)\]')
     parse_inner = False

@@ -17,6 +17,8 @@
 \rhead{\insertauthor}
 \cfoot{\thepage}
 \addtolength{\headheight}{2pt} % space for the rule
+% Indexing helper
+\newcommand{\addtoindex}[1]{#1\index{#1}}
 ```
 
 [TOC]
@@ -43,9 +45,9 @@ odd!):
 Or numbered ones (more waffle, a bit more waffle, even more waffle, and---you
 guessed it---some more waffle!):
 
-1. foo
-1. bar
-1. baz
+1. [[\addtoindex{foo}]]
+1. [[\addtoindex{bar}]]
+1. [[\addtoindex{baz}]]
 
 It also allowed footnotes, but they don't convert to LaTeX with the default
 renderer. I'll try to make them work, but will definitely add custom syntax for
@@ -83,3 +85,5 @@ Foo bar baz.
 ## Second appendix
 
 Quux.
+
+[INDEX]

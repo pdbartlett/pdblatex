@@ -215,6 +215,10 @@ class IdiomaticRenderer(CitationRenderer):
             return '\\printbibliography\n'
         if token.content == 'FIGURES':
             return '\\listoffigures\n'
+        if token.content == 'INDEX':
+            self.packages['makeidx'] = ''
+            self.preamble += '\\makeindex\n'
+            return '\\printindex\n'
         if token.content == 'TABLES':
             return '\\listoftables\n'
         if token.content == 'TOC':
