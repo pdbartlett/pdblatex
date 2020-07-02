@@ -1,8 +1,8 @@
 # Example Document
 [Author: Paul D. Bartlett]
 [Date: April 1, 2020]
-[Package: amsmath, fancyhdr, float]
-[Package: circ(basic)]
+[Package: amsmath, fancyhdr]
+[Package: draftwatermark(text=TEST,scale=6)]
 
 ```preambleLaTeX
 \pagestyle{fancy}
@@ -62,39 +62,6 @@ the inclusion of literal [[\LaTeX{}]] code:
 \nabla \times \mathbf{E} &= -\frac{\partial \mathbf{B}} {\partial t}\\
 \nabla \times \mathbf{H} &= \mathbf{J} + \frac{\partial \mathbf{D}} {\partial t}
 \end{align}
-```
-
-```inlineLaTeX
-\begin{figure}[H]
-\centering
-\begin{circuit}0
-\npn1 {?} B l               % transistor
-\frompin npn1C              % draw from collector
-\- 1 u                      % some wire
-\nl\A1 {$I_C$} u            % ammeter for current of collector
-\atpin npn1B                % continue drawing from base
-\- 1 l                      % some wire
-\R1 {510k} l                % resistor
-\- 1 l                      % some wire to the edge
-\centerto A1                % draw centered to ammeter 1
-\nl\A2 {$I_B$} u            % ammeter 2
-\frompin A2b                % link ammeter 2 with resistor
-\vtopin R1l
-\frompin A1t
-\- 1 u
-\.1                         % junction
-\frompin A2t                % wire to ammeter 2
-\vtopin .1
-\htopin .1
-\- 1 u
-\cc\connection1 {$U_b$} c u % driving voltage
-\frompin npn1E
-\- 1 d
-\GND1                       % ground
-\end{circuit}
-\caption{Simple circuit}
-\label{circuit}
-\end{figure}
 ```
 
 [BIBLIO]
