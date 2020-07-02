@@ -5,10 +5,16 @@
 [Package: draftwatermark(text=TEST,scale=6)]
 
 ```preambleLaTeX
+% Make title and author available
+\makeatletter
+\let\inserttitle\@title
+\let\insertauthor\@author
+\makeatother
+% Put title and author in header
 \pagestyle{fancy}
 \fancyhf{}
-\lhead{TEST}
-\rhead{DOCUMENT}
+\lhead{``\inserttitle''}
+\rhead{\insertauthor}
 \cfoot{\thepage}
 \addtolength{\headheight}{2pt} % space for the rule
 ```

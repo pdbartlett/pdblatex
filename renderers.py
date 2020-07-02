@@ -63,11 +63,11 @@ class CitationRenderer(LaTeXRenderer):
         inner = self.render_inner(token)
 
         template = ('\\documentclass[{docopts}]{{{doctype}}}\n'
-                    '{packages}'
-                    '{preamble}'
                     '\\title{{{title}}}\n'
                     '\\author{{{author}}}\n'
                     '\\date{{{date}}}\n'
+                    '{packages}'
+                    '{preamble}'
                     '\\begin{{document}}\n'
                     '\\maketitle\n'
                     '{inner}'
@@ -79,11 +79,11 @@ class CitationRenderer(LaTeXRenderer):
 
         return template.format(doctype=doctype,
                                docopts=docopts,
-                               packages=self.render_packages(),
-                               preamble=self.get_preamble(),
                                title=title,
                                author=author,
                                date=date,
+                               packages=self.render_packages(),
+                               preamble=self.get_preamble(),
                                inner=inner,
                                postamble=self.get_postamble())
 
