@@ -50,7 +50,6 @@ class CitationRenderer(LaTeXRenderer):
 
     def cite_helper(self, command, token):
         self.packages['biblatex'] = '[style=authoryear-ibid,backend=biber]'
-        self.packages['tocbibind'] = '[section,nottoc,notbib]'
         template = ' \\{command}{{{citekey}}}'
         return template.format(command=command, citekey=token.content)
 
@@ -116,7 +115,7 @@ class CitationRenderer(LaTeXRenderer):
     def get_postamble(self):
         if not self.get_bib_path():
             return ''
-        return '\\addcontentsline{toc}{section}{References}\n\\printbibliography\n'
+        return '\\addcontentsline{toc}{section}{\\bibname}\n\\printbibliography\n'
 
     @staticmethod
     def newext(filename, ext):
@@ -223,6 +222,7 @@ class IdiomaticRenderer(CitationRenderer):
         if token.content == 'TABLES':
             return '\\listoftables\n'
         if token.content == 'TOC':
+            self.packages['tocbibind'] = '[section,nottoc,notbib]'
             return '\\tableofcontents\n'
 
     def get_doctype_data(self):
