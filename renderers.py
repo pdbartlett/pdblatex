@@ -50,6 +50,7 @@ class CitationRenderer(LaTeXRenderer):
 
     def cite_helper(self, command, token):
         self.packages['biblatex'] = '[style=authoryear-ibid,backend=biber]'
+        self.packages['tocbibind'] = '[section,nottoc,notbib]'
         template = ' \\{command}{{{citekey}}}'
         return template.format(command=command, citekey=token.content)
 
@@ -92,7 +93,7 @@ class CitationRenderer(LaTeXRenderer):
 
     def get_doc_metadata(self):
         basename = os.path.splitext(os.path.basename(self.path))[0]
-        title = basename.replace('-', ' ').replace('_', ' ')
+        title = basename.replace('_', ' ')
         match = PAREN_DATE_RE.match(title)
         if match:
             title = match.group(1)
@@ -110,12 +111,12 @@ class CitationRenderer(LaTeXRenderer):
         bibpath = self.get_bib_path()
         if not bibpath:
             return ''
-        return '\\addbibresource{"' + bibpath + '"}\n'
+        return '\\addbibresource{' + bibpath + '}\n'
 
     def get_postamble(self):
         if not self.get_bib_path():
             return ''
-        return '\\printbibliography\n'
+        return '\\addcontentsline{toc}{section}{References}\n\\printbibliography\n'
 
     @staticmethod
     def newext(filename, ext):
@@ -212,7 +213,7 @@ class IdiomaticRenderer(CitationRenderer):
     def render_special_section(self, token):
         if token.content == 'BIBLIO':
             self.bib_printed = True
-            return '\\printbibliography\n'
+            return super().get_postamble()
         if token.content == 'FIGURES':
             return '\\listoffigures\n'
         if token.content == 'INDEX':

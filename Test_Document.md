@@ -22,7 +22,6 @@
 ```
 
 [TOC]
-[FIGURES]
 
 ## Introduction
 
