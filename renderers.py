@@ -193,6 +193,14 @@ class IdiomaticRenderer(CitationRenderer):
         return ''
 
     def render_block_code(self, token):
+        if token.language.lower() == 'bibtex':
+            self.packages['biblatex'] = '[style=authoryear-ibid,backend=biber]'
+            path = self.newext(os.path.basename(self.path), '.tmp.bib')
+            self.preamble += '\\begin{{filecontents*}}{{{}}}\n'.format(path)
+            self.preamble += self.render_raw_text(token.children[0], False)
+            self.preamble += '\\end{filecontents*}\n'
+            self.preamble += '\\addbibresource{{{}}}\n'.format(path)
+            return ''
         if token.language.lower() == 'inlinelatex':
             return self.render_raw_text(token.children[0], False)
         if token.language.lower() == 'preamblelatex':
@@ -212,7 +220,7 @@ class IdiomaticRenderer(CitationRenderer):
     def render_special_section(self, token):
         if token.content == 'BIBLIO':
             self.bib_printed = True
-            return super().get_postamble()
+            return '\\addcontentsline{toc}{section}{\\bibname}\n\\printbibliography\n'
         if token.content == 'FIGURES':
             return '\\listoffigures\n'
         if token.content == 'INDEX':

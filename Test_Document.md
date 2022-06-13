@@ -4,6 +4,19 @@
 [Package: amsmath, fancyhdr]
 [Package: draftwatermark(text=TEST,scale=6)]
 
+```bibTeX
+@book{Jones2000,
+	Author = {Jones, J.},
+	Publisher = {E.G. Books},
+	Title = {An Example Citation},
+	Year = {2000}}
+@book{Smith2001,
+	Author = {Smith, Winston},
+	Publisher = {A.N. Other},
+	Title = {Another Quotable Source},
+	Year = {2001}}
+```
+
 ```preambleLaTeX
 % Make title and author available
 \makeatletter
