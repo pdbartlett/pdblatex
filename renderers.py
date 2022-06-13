@@ -88,9 +88,12 @@ class IdiomaticRenderer(LaTeXRenderer):
         return self.cite_helper('textcite', token)
 
     def cite_helper(self, command, token):
-        self.packages['biblatex'] = '[style=authoryear-ibid,backend=biber]'
+        self.add_biblatex()
         template = ' \\{command}{{{citekey}}}'
         return template.format(command=command, citekey=token.content)
+
+    def add_biblatex(self):
+        self.packages['biblatex'] = '[style=authoryear-ibid,backend=biber]'
 
     def render_heading(self, token):
         inner = self.render_inner(token)
@@ -151,7 +154,7 @@ class IdiomaticRenderer(LaTeXRenderer):
 
     def render_block_code(self, token):
         if token.language.lower() == 'bibtex':
-            self.packages['biblatex'] = '[style=authoryear-ibid,backend=biber]'
+            self.add_biblatex()
             path = self.newext(os.path.basename(self.path), '.tmp.bib')
             self.preamble += '\\begin{{filecontents*}}{{{}}}\n'.format(path)
             self.preamble += self.render_raw_text(token.children[0], False)
@@ -176,7 +179,7 @@ class IdiomaticRenderer(LaTeXRenderer):
 
     def render_special_section(self, token):
         if token.content == 'BIBLIO':
-            self.bib_printed = True
+            self.add_biblatex()
             return '\\addcontentsline{toc}{section}{\\bibname}\n\\printbibliography\n'
         if token.content == 'FIGURES':
             return '\\listoffigures\n'
