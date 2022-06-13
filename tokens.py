@@ -16,7 +16,7 @@ class TextCite(SpanToken):
 
 class DocMetaData(SpanToken):
     pattern = re.compile(
-        r'\[(Author|Date|Doctype|Docopts|H2Level|SecNumDepth|TocDepth)\s*:\s*(.*)\]')
+        r'\[(Author|Date|Doctype|Docopts|H2Level|MathPkg|SecNumDepth|TocDepth)\s*:\s*(.*)\]')
     parse_inner = False
     def __init__(self, match):
         self.key = match.group(1)

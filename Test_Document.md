@@ -1,7 +1,7 @@
 # Example Document
 [Author: Paul D. Bartlett]
 [Date: April 1, 2020]
-[Package: amsmath, fancyhdr]
+[Package: fancyhdr]
 [Package: draftwatermark(text=TEST,scale=6)]
 
 ```bibTeX

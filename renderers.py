@@ -22,6 +22,7 @@ DOCLEVELS=['part', 'chapter', 'section', 'subsection', 'subsubsection']
 DOCOPTS='11pt,a4paper'
 DOCTYPE='article'
 H2_LEVEL='2'
+MATHPKG='amsmath'
 PAREN_DATE_RE=re.compile(r'(.*) \((.*)\)')
 
 
@@ -80,6 +81,12 @@ class IdiomaticRenderer(LaTeXRenderer):
                                packages=self.render_packages(),
                                preamble=self.get_preamble(),
                                inner=inner)
+
+    def render_packages(self):
+        mathpkg = self.metadata.get('MathPkg', MATHPKG)
+        if mathpkg.lower() != 'none':
+            self.packages[mathpkg] = ''
+        return super().render_packages()
 
     def render_paren_cite(self, token):
         return self.cite_helper('parencite', token)
