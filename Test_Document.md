@@ -16,9 +16,8 @@
 	Year = {2001}}
 ```
 
-```preambleLaTeX
-% Indexing helper
-\newcommand{\addtoindex}[1]{#1\index{#1}}
+```preambleLaTex
+\def\BibTeX{{\textsc{Bib}\TeX}}
 ```
 
 [TOC]
@@ -44,9 +43,9 @@ odd!):
 Or numbered ones (more waffle, a bit more waffle, even more waffle, and---you
 guessed it---some more waffle!):
 
-1. [[\addtoindex{foo}]]
-1. [[\addtoindex{bar}]]
-1. [[\addtoindex{baz}]]
+1. !foo
+1. !bar
+1. !baz
 
 It also allowed footnotes, but they don't convert to LaTeX with the default
 renderer. I'll try to make them work, but will definitely add custom syntax for
@@ -60,7 +59,7 @@ full equations:
 $$ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$
 
 Another less than obvious feature is `code fences`, but we (ab)use them to allow
-the inclusion of literal [[\LaTeX{}]] code:
+the inclusion of literal [[\LaTeX{}]] code (or [[\BibTeX{}]] for references):
 
 ```inlineLaTeX
 \begin{align}

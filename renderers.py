@@ -14,7 +14,7 @@ from mistletoe.latex_renderer import LaTeXRenderer
 
 from tokens import (ParenCite, TextCite, DocMetaData, DoubleQuote, LatexLiteral,
                     LatexPackageSimple, LatexPackageWithOptions, MixedFraction,
-                    SimpleFraction, SpecialSection)
+                    SimpleFraction, SimpleIndexItem, SpecialSection)
 
 AUTHOR='Sophie Bartlett'
 DATE_FORMAT='%d %B %Y'
@@ -51,7 +51,8 @@ class IdiomaticRenderer(LaTeXRenderer):
         super().__init__(*chain([ParenCite, TextCite, DocMetaData, DoubleQuote,
                                  LatexLiteral, LatexPackageSimple,
                                  LatexPackageWithOptions, MixedFraction,
-                                 SimpleFraction, SpecialSection], extras))
+                                 SimpleFraction, SimpleIndexItem, SpecialSection],
+                                extras))
 
     def render_file(self):
         try:
@@ -194,6 +195,10 @@ class IdiomaticRenderer(LaTeXRenderer):
     def render_mixed_fraction(token):
         return '${z}\\frac{{{n}}}{{{d}}}$'.format(z=token.whole,
                                                   n=token.numer, d=token.denom)
+
+    def render_simple_index_item(self, token):
+        self.packages['makeidx'] = ''
+        return '{i}\\index{{{i}}}'.format(i=token.content)
 
     @staticmethod
     def render_simple_fraction(token):

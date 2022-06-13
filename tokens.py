@@ -29,7 +29,7 @@ class DoubleQuote(SpanToken):
 
 
 class LatexLiteral(SpanToken):
-    pattern = re.compile(r'\[\[(.*)\]\]')
+    pattern = re.compile(r'\[\[([^\]]*)\]\]')
     parse_inner = False
 
 
@@ -61,6 +61,11 @@ class SimpleFraction(SpanToken):
     def __init__(self, match):
         self.numer = match.group(1)
         self.denom = match.group(2)
+
+
+class SimpleIndexItem(SpanToken):
+    pattern = re.compile(r'!([A-Za-z]+)')
+    parse_inner = False
 
 
 class SpecialSection(SpanToken):
