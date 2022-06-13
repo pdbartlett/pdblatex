@@ -25,11 +25,18 @@ H2_LEVEL='2'
 PAREN_DATE_RE=re.compile(r'(.*) \((.*)\)')
 
 
-class CitationRenderer(LaTeXRenderer):
+class IdiomaticRenderer(LaTeXRenderer):
     def __init__(self, path, *extras):
         self.path = path
         self.logger = logging.getLogger(__name__)
-        super().__init__(*chain([ParenCite, TextCite], extras))
+        self.title = ''
+        self.preamble = ''
+        self.metadata = {}
+        self.quote_open = False
+        super().__init__(*chain([ParenCite, TextCite, DocMetaData, DoubleQuote,
+                                 LatexLiteral, LatexPackageSimple,
+                                 LatexPackageWithOptions, MixedFraction,
+                                 SimpleFraction, SpecialSection], extras))
 
     def render_file(self):
         try:
@@ -41,17 +48,6 @@ class CitationRenderer(LaTeXRenderer):
             subprocess.run(['latexmk', '-pdf', outfile])
         except OSError as err:
             sys.exit('Problem processing "' + self.path + '": ' + str(err))
-
-    def render_paren_cite(self, token):
-        return self.cite_helper('parencite', token)
-
-    def render_text_cite(self, token):
-        return self.cite_helper('textcite', token)
-
-    def cite_helper(self, command, token):
-        self.packages['biblatex'] = '[style=authoryear-ibid,backend=biber]'
-        template = ' \\{command}{{{citekey}}}'
-        return template.format(command=command, citekey=token.content)
 
     def render_document(self, token):
         # From superclass; not sure it does much in current version.
@@ -71,7 +67,6 @@ class CitationRenderer(LaTeXRenderer):
                     '\\begin{{document}}\n'
                     '\\maketitle\n'
                     '{inner}'
-                    '{postamble}'
                     '\\end{{document}}\n')
 
         doctype, docopts = self.get_doctype_data()
@@ -84,56 +79,18 @@ class CitationRenderer(LaTeXRenderer):
                                date=date,
                                packages=self.render_packages(),
                                preamble=self.get_preamble(),
-                               inner=inner,
-                               postamble=self.get_postamble())
+                               inner=inner)
 
-    def get_doctype_data(self):
-        return (DOCTYPE, DOCOPTS)
+    def render_paren_cite(self, token):
+        return self.cite_helper('parencite', token)
 
-    def get_doc_metadata(self):
-        basename = os.path.splitext(os.path.basename(self.path))[0]
-        title = basename.replace('_', ' ')
-        match = PAREN_DATE_RE.match(title)
-        if match:
-            title = match.group(1)
-            date = match.group(2)
-        else:
-            date = datetime.today().strftime(DATE_FORMAT)
+    def render_text_cite(self, token):
+        return self.cite_helper('textcite', token)
 
-        return (title.title(), AUTHOR, date)
-
-    def get_bib_path(self):
-        bibpath = self.newext(os.path.basename(self.path), '.bib')
-        return bibpath if os.path.isfile(bibpath) else ''
-
-    def get_preamble(self):
-        bibpath = self.get_bib_path()
-        if not bibpath:
-            return ''
-        return '\\addbibresource{' + bibpath + '}\n'
-
-    def get_postamble(self):
-        if not self.get_bib_path():
-            return ''
-        return '\\addcontentsline{toc}{section}{\\bibname}\n\\printbibliography\n'
-
-    @staticmethod
-    def newext(filename, ext):
-        if filename[-3:] == '.md':
-            return filename[:-3] + ext
-        return filename + ext
-
-
-class IdiomaticRenderer(CitationRenderer):
-    def __init__(self, path):
-        self.title = ''
-        self.preamble = ''
-        self.metadata = {}
-        self.bib_printed = False
-        self.quote_open = False
-        super().__init__(path, DocMetaData, DoubleQuote, LatexLiteral,
-            LatexPackageSimple, LatexPackageWithOptions, MixedFraction,
-            SimpleFraction, SpecialSection)
+    def cite_helper(self, command, token):
+        self.packages['biblatex'] = '[style=authoryear-ibid,backend=biber]'
+        template = ' \\{command}{{{citekey}}}'
+        return template.format(command=command, citekey=token.content)
 
     def render_heading(self, token):
         inner = self.render_inner(token)
@@ -234,23 +191,33 @@ class IdiomaticRenderer(CitationRenderer):
             return '\\tableofcontents\n'
 
     def get_doctype_data(self):
-        doctype, docopts = super().get_doctype_data()
-        return (self.metadata.get('Doctype', doctype),
-                self.metadata.get('Docopts', docopts))
+        return (self.metadata.get('Doctype', DOCTYPE),
+                self.metadata.get('Docopts', DOCOPTS))
 
     def get_doc_metadata(self):
-        title, author, date = super().get_doc_metadata()
+        basename = os.path.splitext(os.path.basename(self.path))[0]
+        title = basename.replace('_', ' ')
+        match = PAREN_DATE_RE.match(title)
+        if match:
+            title = match.group(1)
+            date = match.group(2)
+        else:
+            date = datetime.today().strftime(DATE_FORMAT)
+
         return (self.title or title,
-                self.metadata.get('Author', author),
+                self.metadata.get('Author', AUTHOR),
                 self.metadata.get('Date', date))
 
     def get_preamble(self):
-        preamble = super().get_preamble() + self.preamble
+        preamble = self.preamble
         if 'SecNumDepth' in self.metadata:
             preamble += '\\setcounter{secnumdepth}{' + self.metadata['SecNumDepth'] + '}\n'
         if 'TocDepth' in self.metadata:
             preamble += '\\setcounter{tocdepth}{' + self.metadata['TocDepth'] + '}\n'
         return preamble
 
-    def get_postamble(self):
-        return '' if self.bib_printed else super().get_postamble()
+    @staticmethod
+    def newext(filename, ext):
+        if filename[-3:] == '.md':
+            return filename[:-3] + ext
+        return filename + ext
