@@ -47,19 +47,19 @@ guessed it---some more waffle!):
 1. !bar
 1. !baz
 
-It also allowed footnotes, but they don't convert to LaTeX with the default
+It also allowed footnotes, but they don't convert to [[\LaTeX{}]] with the default
 renderer. I'll try to make them work, but will definitely add custom syntax for
 full citation/reference support, both `parenthetical citations' (Jones2000), and
 "inline ones" as used by Smith2001.
 
-There is also support for LaTeX mathematical formatting, e.g. $y=mx+c$, though
+There is also support for [[\LaTeX{}]] mathematical formatting, e.g. $y=mx+c$, though
 that is probably not of much use for history essays! Even less useful would be
 full equations:
 
 $$ x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} $$
 
-Another less than obvious feature is `code fences`, but we (ab)use them to allow
-the inclusion of literal [[\LaTeX{}]] code (or [[\BibTeX{}]] for references):
+Another less than obvious feature is `code fences`, which we (ab)use them to allow
+the inclusion of literal [[\LaTeX{}]] code:
 
 ```inlineLaTeX
 \begin{align}
@@ -69,6 +69,8 @@ the inclusion of literal [[\LaTeX{}]] code (or [[\BibTeX{}]] for references):
 \nabla \times \mathbf{H} &= \mathbf{J} + \frac{\partial \mathbf{D}} {\partial t}
 \end{align}
 ```
+
+Or [[\BibTeX{}]] for references; see below.
 
 [BIBLIO]
 
