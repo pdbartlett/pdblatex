@@ -1,7 +1,6 @@
 # Example Document
 [Author: Paul D. Bartlett]
 [Date: April 1, 2020]
-[Package: fancyhdr]
 [Package: draftwatermark(text=TEST,scale=6)]
 
 ```bibTeX
@@ -18,18 +17,6 @@
 ```
 
 ```preambleLaTeX
-% Make title and author available
-\makeatletter
-\let\inserttitle\@title
-\let\insertauthor\@author
-\makeatother
-% Put title and author in header
-\pagestyle{fancy}
-\fancyhf{}
-\lhead{``\inserttitle''}
-\rhead{\insertauthor}
-\cfoot{\thepage}
-\addtolength{\headheight}{2pt} % space for the rule
 % Indexing helper
 \newcommand{\addtoindex}[1]{#1\index{#1}}
 ```

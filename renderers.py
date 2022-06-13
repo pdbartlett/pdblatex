@@ -24,6 +24,20 @@ DOCTYPE='article'
 H2_LEVEL='2'
 MATHPKG='amsmath'
 PAREN_DATE_RE=re.compile(r'(.*) \((.*)\)')
+STD_PREAMBLE='''
+% Make title and author available
+\\makeatletter
+\\let\\inserttitle\@title
+\\let\\insertauthor\@author
+\\makeatother
+% Put title and author in header
+\\pagestyle{fancy}
+\\fancyhf{}
+\\lhead{``\\inserttitle''}
+\\rhead{\\insertauthor}
+\\cfoot{\\thepage}
+\\addtolength{\\headheight}{2pt} % space for the rule
+'''
 
 
 class IdiomaticRenderer(LaTeXRenderer):
@@ -31,7 +45,7 @@ class IdiomaticRenderer(LaTeXRenderer):
         self.path = path
         self.logger = logging.getLogger(__name__)
         self.title = ''
-        self.preamble = ''
+        self.preamble = STD_PREAMBLE
         self.metadata = {}
         self.quote_open = False
         super().__init__(*chain([ParenCite, TextCite, DocMetaData, DoubleQuote,
@@ -83,6 +97,7 @@ class IdiomaticRenderer(LaTeXRenderer):
                                inner=inner)
 
     def render_packages(self):
+        self.packages['fancyhdr'] = '' # Used in STD_PREAMBLE.
         mathpkg = self.metadata.get('MathPkg', MATHPKG)
         if mathpkg.lower() != 'none':
             self.packages[mathpkg] = ''
