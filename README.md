@@ -20,7 +20,7 @@ Utilities for working with LaTeX, currently focussed on generating from Markdown
 1. Generate `.pdf` file output, which `sophistory` does via a LaTeX intermediate:
 
    ```sh
-   python3 sophistory.py your-doc.md
+   $ python3 sophistory.py your-doc.md
    ```
 
 1. DONE!
