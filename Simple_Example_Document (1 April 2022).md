@@ -5,7 +5,11 @@
 This document is intended to document all the things that can be done with
 "non-weird", Markdown-inspired syntax.
 
-## Basic features
+## Features
+
+### Basic
+
+These are some very basic features that can be used:
 
 1. title and date taken from name of `.md` one, or uses today's date if none specified
 1. author defaults to Sophie Bartlett
@@ -17,11 +21,29 @@ This document is intended to document all the things that can be done with
 1. parenthetic citations (Jones2000) as well as direct ones, like Smith2001
 1. simple !indexing of !terms using hopefully intuitive !syntax
 1. inline mathematical expressions, like $y = f(x)$
+1. sections and subsections
 
-## Some more features
+### Additional
+
+Here are a few more features, broken out separately mainly to demonstrate
+subsections, but it also gives a chance to show blockquotes:
+
+> Blockquotes, like this one, can be used when  you need to add a sizeable
+> portion of text from a book, speech or other source, and format it so that it
+> stands out more clearly.
+
+It also provides an opportunity to see how subsequent paragraphs are formatted
+(they are indented rather than "skipping space", though this can be changed at
+a later date if it's preferable.
+
+It also goves a chances to show a different type of list. This one is
+bulleted---also known as unordered---as opposed to the numbered/ordered list used
+in the previous section.
 
 * bulleted lists (like this one)
-* organisation of appendices, frontmatter and backmatter
+* the different dashes: hyphens (e.g. side-effect), `en` dashes (e.g. 1--2 ideas),
+  or `em` dashes as shown in the "parenthetical" example above
+* addition of appendices (lettered instead of numbered as sections are)
 * manual page breaks
 
 ---
