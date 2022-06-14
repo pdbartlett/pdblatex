@@ -87,14 +87,17 @@ class IdiomaticRenderer(LaTeXRenderer):
 
         doctype, docopts = self.get_doctype_data()
         title, author, date = self.get_doc_metadata()
+        preamble = self.get_preamble()
+        # Do this last in case other calls add more.
+        packages = self.render_packages()
 
         return template.format(doctype=doctype,
                                docopts=docopts,
                                title=title,
                                author=author,
                                date=date,
-                               packages=self.render_packages(),
-                               preamble=self.get_preamble(),
+                               packages=packages,
+                               preamble=preamble,
                                inner=inner)
 
     def render_packages(self):
@@ -244,6 +247,9 @@ class IdiomaticRenderer(LaTeXRenderer):
             preamble += '\\setcounter{secnumdepth}{' + self.metadata['SecNumDepth'] + '}\n'
         if 'TocDepth' in self.metadata:
             preamble += '\\setcounter{tocdepth}{' + self.metadata['TocDepth'] + '}\n'
+        bibpath = self.newext(self.path, '.bib')
+        if os.path.isfile(bibpath):
+            preamble += '\\addbibresource{{{}}}\n'.format(os.path.basename(bibpath))
         return preamble
 
     @staticmethod
