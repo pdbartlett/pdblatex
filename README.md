@@ -10,6 +10,13 @@ Utilities for working with LaTeX, currently focussed on generating from Markdown
    Python 3.8.9
    ```
    
+1. Ensure you have a valid LaTeX installation, complete with `latexmk`:
+
+   ```sh
+   $ which latexmk
+   /Library/TeX/texbin/latexmk
+   ```
+
 1. Install `mistletoe`, the super-useful library upon which `sophistory` depends:
 
    ```sh
