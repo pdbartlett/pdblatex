@@ -9,7 +9,7 @@ Utilities for working with LaTeX, currently focussed on generating from Markdown
    $ python3 -V
    Python 3.8.9
    ```
-   
+
 1. Ensure you have a valid LaTeX installation, complete with `latexmk`:
 
    ```sh
@@ -23,7 +23,13 @@ Utilities for working with LaTeX, currently focussed on generating from Markdown
    $ pip3 install mistletoe
    ```
 
-1. Write your markdown doc, using the supplied examples for insipration.
+1. Download the contents of this repository, e.g.:
+
+   ```sh
+   $ git clone https://github.com/pdbartlett/pdblatex.git
+   ```
+
+1. Write your markdown doc, using the supplied examples for inspiration.
 1. Generate `.pdf` file output, which `sophistory` does via a LaTeX intermediate:
 
    ```sh
