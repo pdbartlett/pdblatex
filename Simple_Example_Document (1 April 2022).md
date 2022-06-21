@@ -1,9 +1,12 @@
 [TOC]
 
-## Introduction
+## Abstract
 
-This document is intended to document all the things that can be done with
+This document is intended to demonstrate all the things that can be done with
 "non-weird", Markdown-inspired syntax.
+
+Other, more complex things are possible, but with some more tricky (but still
+hopefully reasonable) syntax.
 
 ## Features
 

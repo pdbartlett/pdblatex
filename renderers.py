@@ -49,6 +49,8 @@ class IdiomaticRenderer(LaTeXRenderer):
         self.path = path
         self.logger = logging.getLogger(__name__)
         self.title = ''
+        self.abstract = ''
+        self.para_is_abstract = False
         self.preamble = STD_PREAMBLE
         self.biblios = []
         self.metadata = {}
@@ -88,6 +90,7 @@ class IdiomaticRenderer(LaTeXRenderer):
                     '{preamble}'
                     '\\begin{{document}}\n'
                     '\\maketitle\n'
+                    '{abstract}'
                     '{inner}'
                     '\\end{{document}}\n')
 
@@ -103,6 +106,7 @@ class IdiomaticRenderer(LaTeXRenderer):
                                date=date,
                                packages=packages,
                                preamble=preamble,
+                               abstract=self.abstract,
                                inner=inner)
 
     def render_packages(self):
@@ -126,8 +130,25 @@ class IdiomaticRenderer(LaTeXRenderer):
     def add_biblatex(self):
         self.packages.setdefault('biblatex', BIBLATEX_OPTS)
 
+    def render_paragraph(self, token):
+        default = super().render_paragraph(token)
+        if self.para_is_abstract:
+            self.abstract += default
+            return ''
+
+        return default
+
     def render_heading(self, token):
         inner = self.render_inner(token)
+
+        if inner.upper() == SpecialSectionType.ABSTRACT.name:
+            self.para_is_abstract = True
+            self.abstract = '\\begin{abstract}\n'
+            return ''
+
+        if self.para_is_abstract:
+            self.para_is_abstract = False
+            self.abstract += '\\end{abstract}\n'
 
         if inner.upper() == SpecialSectionType.FRONTMATTER.name:
             return '\n\\thispagestyle{empty}\n\\frontmatter\n'

@@ -12,4 +12,4 @@ class GeneratedContentType(Enum):
 
 
 class SpecialSectionType(Enum):
-    FRONTMATTER, MAINMATTER, BACKMATTER, APPENDIX, APPENDICES = range(5)
+    ABSTRACT, FRONTMATTER, MAINMATTER, BACKMATTER, APPENDIX, APPENDICES = range(6)

@@ -1,12 +1,18 @@
+# OSX
+.DS_Store
+
 # Python
 __pycache__/
 
-# Tex
-
-*.tex # .tex files are themselves intermediate in pdblatex
+# Pdblatex
+*.tex
+*.tmp.*
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
+*.idx
+*.ilg
+*.ind
 *.lof
 *.log
 *.lot
@@ -26,7 +32,7 @@ __pycache__/
 # these rules might exclude image files for figures etc.
 # *.ps
 # *.eps
-# *.pdf
+*.pdf
 
 ## Generated if empty string is given at "Please type another file name for output:"
 .pdf
