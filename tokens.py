@@ -1,6 +1,7 @@
 # mistletoe tokens for use in custom renderers.
 
 import re
+from enums import DocMetaDataType, GeneratedContentType
 from mistletoe.span_token import SpanToken
 
 
@@ -15,8 +16,9 @@ class TextCite(SpanToken):
 
 
 class DocMetaData(SpanToken):
+    names = [e.name for e in DocMetaDataType]
     pattern = re.compile(
-        r'\[(Author|Date|Doctype|Docopts|H2Level|MathPkg|SecNumDepth|TocDepth)\s*:\s*(.*)\]')
+        r'\[(' + '|'.join(names) + ')\s*:\s*(.*)\]')
     parse_inner = False
     def __init__(self, match):
         self.key = match.group(1)
@@ -25,6 +27,12 @@ class DocMetaData(SpanToken):
 
 class DoubleQuote(SpanToken):
     pattern = re.compile(r'(")')
+    parse_inner = False
+
+
+class GeneratedContent(SpanToken):
+    names = [e.name for e in GeneratedContentType]
+    pattern = re.compile(r'\[(' + '|'.join(names) + ')\]')
     parse_inner = False
 
 
@@ -65,9 +73,4 @@ class SimpleFraction(SpanToken):
 
 class SimpleIndexItem(SpanToken):
     pattern = re.compile(r'!([A-Za-z]+)')
-    parse_inner = False
-
-
-class SpecialSection(SpanToken):
-    pattern = re.compile(r'\[(BIBLIO|FIGURES|INDEX|TABLES|TOC)\]')
     parse_inner = False

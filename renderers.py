@@ -12,9 +12,11 @@ import mistletoe
 from mistletoe import Document
 from mistletoe.latex_renderer import LaTeXRenderer
 
-from tokens import (ParenCite, TextCite, DocMetaData, DoubleQuote, LatexLiteral,
-                    LatexPackageSimple, LatexPackageWithOptions, MixedFraction,
-                    SimpleFraction, SimpleIndexItem, SpecialSection)
+from enums import DocMetaDataType, GeneratedContentType, SpecialSectionType
+from tokens import (ParenCite, TextCite, DocMetaData, DoubleQuote,
+                    GeneratedContent, LatexLiteral, LatexPackageSimple,
+                    LatexPackageWithOptions, MixedFraction, SimpleFraction,
+                    SimpleIndexItem)
 
 AUTHOR='Sophie Bartlett'
 DATE_FORMAT='%d %B %Y'
@@ -23,6 +25,8 @@ DOCOPTS='11pt,a4paper'
 DOCTYPE='article'
 H2_LEVEL='2'
 MATHPKG='amsmath'
+
+BIBLATEX_OPTS = '[style=authoryear-ibid,backend=biber]'
 PAREN_DATE_RE=re.compile(r'(.*) \((.*)\)')
 STD_PREAMBLE='''
 % Make title and author available
@@ -46,19 +50,21 @@ class IdiomaticRenderer(LaTeXRenderer):
         self.logger = logging.getLogger(__name__)
         self.title = ''
         self.preamble = STD_PREAMBLE
+        self.biblios = []
         self.metadata = {}
         self.quote_open = False
         super().__init__(*chain([ParenCite, TextCite, DocMetaData, DoubleQuote,
-                                 LatexLiteral, LatexPackageSimple,
-                                 LatexPackageWithOptions, MixedFraction,
-                                 SimpleFraction, SimpleIndexItem, SpecialSection],
+                                 GeneratedContent, LatexLiteral,
+                                 LatexPackageSimple, LatexPackageWithOptions,
+                                 MixedFraction, SimpleFraction,
+                                 SimpleIndexItem],
                                 extras))
 
     def render_file(self):
         try:
             with open(self.path, 'r') as fin:
                 rendered = self.render(Document(fin))
-            outfile = self.newext(self.path, '.tex')
+            outfile = self.newext('.tex')
             with open(outfile, 'w') as fout:
                 fout.write(rendered)
             subprocess.run(['latexmk', '-pdf', outfile])
@@ -85,8 +91,7 @@ class IdiomaticRenderer(LaTeXRenderer):
                     '{inner}'
                     '\\end{{document}}\n')
 
-        doctype, docopts = self.get_doctype_data()
-        title, author, date = self.get_doc_metadata()
+        title, author, date, doctype, docopts = self.get_doc_metadata()
         preamble = self.get_preamble()
         # Do this last in case other calls add more.
         packages = self.render_packages()
@@ -102,7 +107,7 @@ class IdiomaticRenderer(LaTeXRenderer):
 
     def render_packages(self):
         self.packages['fancyhdr'] = '' # Used in STD_PREAMBLE.
-        mathpkg = self.metadata.get('MathPkg', MATHPKG)
+        mathpkg = self.metadata.get(DocMetaDataType.MathPkg, MATHPKG)
         if mathpkg.lower() != 'none':
             self.packages[mathpkg] = ''
         return super().render_packages()
@@ -119,21 +124,22 @@ class IdiomaticRenderer(LaTeXRenderer):
         return template.format(command=command, citekey=token.content)
 
     def add_biblatex(self):
-        self.packages['biblatex'] = '[style=authoryear-ibid,backend=biber]'
+        self.packages.setdefault('biblatex', BIBLATEX_OPTS)
 
     def render_heading(self, token):
         inner = self.render_inner(token)
 
-        if inner.lower() == "frontmatter":
+        if inner.upper() == SpecialSectionType.FRONTMATTER.name:
             return '\n\\thispagestyle{empty}\n\\frontmatter\n'
 
-        if inner.lower() == "mainmatter":
+        if inner.upper() == SpecialSectionType.MAINMATTER.name:
             return '\n\\mainmatter\n'
 
-        if inner.lower() == "backmatter":
+        if inner.upper() == SpecialSectionType.BACKMATTER.name:
             return '\n\\backmatter\n'
 
-        if inner.lower() == "appendix" or inner.lower() == "appendices":
+        if inner.upper() in [SpecialSectionType.APPENDIX.name,
+                             SpecialSectionType.APPENDICES.name]:
             return '\n\\appendix\n'
 
         if token.level == 1:
@@ -144,7 +150,7 @@ class IdiomaticRenderer(LaTeXRenderer):
                 self.title = inner
             return ''
 
-        h2_level = int(self.metadata.get('H2Level', H2_LEVEL))
+        h2_level = int(self.metadata.get(DocMetaDataType.H2Level, H2_LEVEL))
         level = token.level + h2_level - 2
         if level < 0:
             command = DOCLEVELS[0]
@@ -159,7 +165,7 @@ class IdiomaticRenderer(LaTeXRenderer):
         return '\\pagebreak\n'
 
     def render_doc_meta_data(self, token):
-        self.metadata[token.key] = token.val
+        self.metadata[DocMetaDataType[token.key]] = token.val
         return ''
 
     def render_double_quote(self, token):
@@ -180,12 +186,11 @@ class IdiomaticRenderer(LaTeXRenderer):
 
     def render_block_code(self, token):
         if token.language.lower() == 'bibtex':
-            self.add_biblatex()
-            path = self.newext(os.path.basename(self.path), '.tmp.bib')
+            path = self.newext('.tmp{}.bib'.format(len(self.biblios)))
+            self.biblios.append(path)
             self.preamble += '\\begin{{filecontents*}}{{{}}}\n'.format(path)
             self.preamble += self.render_raw_text(token.children[0], False)
             self.preamble += '\\end{filecontents*}\n'
-            self.preamble += '\\addbibresource{{{}}}\n'.format(path)
             return ''
         if token.language.lower() == 'inlinelatex':
             return self.render_raw_text(token.children[0], False)
@@ -207,25 +212,21 @@ class IdiomaticRenderer(LaTeXRenderer):
     def render_simple_fraction(token):
         return '$\\frac{{{n}}}{{{d}}}$'.format(n=token.numer, d=token.denom)
 
-    def render_special_section(self, token):
-        if token.content == 'BIBLIO':
+    def render_generated_content(self, token):
+        if token.content == GeneratedContentType.BIBLIO.name:
             self.add_biblatex()
             return '\\addcontentsline{toc}{section}{\\bibname}\n\\printbibliography\n'
-        if token.content == 'FIGURES':
+        if token.content == GeneratedContentType.FIGURES.name:
             return '\\listoffigures\n'
-        if token.content == 'INDEX':
+        if token.content == GeneratedContentType.INDEX.name:
             self.packages['makeidx'] = ''
             self.preamble += '\\makeindex\n'
             return '\\printindex\n'
-        if token.content == 'TABLES':
+        if token.content == GeneratedContentType.TABLES.name:
             return '\\listoftables\n'
-        if token.content == 'TOC':
+        if token.content == GeneratedContentType.TOC.name:
             self.packages['tocbibind'] = '[section,nottoc,notbib]'
             return '\\tableofcontents\n'
-
-    def get_doctype_data(self):
-        return (self.metadata.get('Doctype', DOCTYPE),
-                self.metadata.get('Docopts', DOCOPTS))
 
     def get_doc_metadata(self):
         basename = os.path.splitext(os.path.basename(self.path))[0]
@@ -238,22 +239,27 @@ class IdiomaticRenderer(LaTeXRenderer):
             date = datetime.today().strftime(DATE_FORMAT)
 
         return (self.title or title,
-                self.metadata.get('Author', AUTHOR),
-                self.metadata.get('Date', date))
+                self.metadata.get(DocMetaDataType.Author, AUTHOR),
+                self.metadata.get(DocMetaDataType.Date, date),
+                self.metadata.get(DocMetaDataType.Doctype, DOCTYPE),
+                self.metadata.get(DocMetaDataType.Docopts, DOCOPTS))
 
     def get_preamble(self):
         preamble = self.preamble
         if 'SecNumDepth' in self.metadata:
-            preamble += '\\setcounter{secnumdepth}{' + self.metadata['SecNumDepth'] + '}\n'
+            preamble += ('\\setcounter{secnumdepth}{' +
+                self.metadata[DocMetaDataType.SecNumDepth] + '}\n')
         if 'TocDepth' in self.metadata:
-            preamble += '\\setcounter{tocdepth}{' + self.metadata['TocDepth'] + '}\n'
-        bibpath = self.newext(self.path, '.bib')
+            preamble += ('\\setcounter{tocdepth}{' +
+                self.metadata[DocMetaDataType.TocDepth] + '}\n')
+        bibpath = self.newext('.bib')
         if os.path.isfile(bibpath):
-            preamble += '\\addbibresource{{{}}}\n'.format(os.path.basename(bibpath))
+            self.biblios.append(os.path.basename(bibpath))
+        for biblio in self.biblios:
+            preamble += '\\addbibresource{{{}}}\n'.format(biblio)
         return preamble
 
-    @staticmethod
-    def newext(filename, ext):
-        if filename[-3:] == '.md':
-            return filename[:-3] + ext
-        return filename + ext
+    def newext(self, ext):
+        if self.path[-3:] == '.md':
+            return self.path[:-3] + ext
+        return self.path + ext

@@ -1,0 +1,133 @@
+\documentclass[11pt,a4paper]{article}
+\title{Simple Example Document}
+\author{Sophie Bartlett}
+\date{1 April 2022}
+\usepackage[section,nottoc,notbib]{tocbibind}
+\usepackage{listings}
+\usepackage[style=authoryear-ibid,backend=biber]{biblatex}
+\usepackage{makeidx}
+\usepackage{csquotes}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+
+% Make title and author available
+\makeatletter
+\let\inserttitle\@title
+\let\insertauthor\@author
+\makeatother
+% Put title and author in header
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{``\inserttitle''}
+\rhead{\insertauthor}
+\cfoot{\thepage}
+\addtolength{\headheight}{2pt} % space for the rule
+\makeindex
+\addbibresource{Simple_Example_Document (1 April 2022).bib}
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+
+\section{Introduction}
+
+This document is intended to document all the things that can be done with
+``non-weird'', Markdown-inspired syntax.
+
+\section{Features}
+
+\subsection{Basic}
+
+These are some very basic features that can be used:
+\begin{enumerate}
+\item 
+title and date taken from name of \verb|.md| one, or uses today's date if none specified
+
+\item 
+author defaults to Sophie Bartlett
+
+\item 
+\verb|.bib| file with same name as \verb|.md| loaded automatically
+
+\item 
+auto-conversion of double quotes (see \textit{Introduction} above)
+
+\item 
+\textbf{bold}, \textit{italic} and \verb|fixed-width| text
+
+\item 
+numbered lists (like this one)
+
+\item 
+table of contents, lists of figures/tables, bibliography and index placement
+
+\item 
+parenthetic citations \parencite{Jones2000} as well as direct ones, like \textcite{Smith2001}
+
+\item 
+simple indexing\index{indexing} of terms\index{terms} using hopefully intuitive syntax\index{syntax}
+
+\item 
+inline mathematical expressions, like $y = f(x)$
+
+\item 
+sections and subsections
+
+\end{enumerate}
+
+\subsection{Additional}
+
+Here are a few more features, broken out separately mainly to demonstrate
+subsections, but it also gives a chance to show blockquotes:
+\begin{displayquote}
+
+Blockquotes, like this one, can be used when  you need to add a sizeable
+portion of text from a book, speech or other source, and format it so that it
+stands out more clearly.
+\end{displayquote}
+
+It also provides an opportunity to see how subsequent paragraphs are formatted
+(they are indented rather than ``skipping space'', though this can be changed at
+a later date if it's preferable.
+
+It also goves a chances to show a different type of list. This one is
+bulleted---also known as unordered---as opposed to the numbered/ordered list used
+in the previous section.
+\begin{itemize}
+\item 
+bulleted lists (like this one)
+
+\item 
+the different dashes: hyphens (e.g. side-effect), \verb|en| dashes (e.g. 1--2 ideas),
+or \verb|em| dashes as shown in the ``parenthetical'' example above
+
+\item 
+addition of appendices (lettered instead of numbered as sections are)
+
+\item 
+manual page breaks
+
+\end{itemize}
+\pagebreak
+
+\appendix
+
+\section{Extra information}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae diam
+nec libero ultrices placerat id et tellus. Proin vestibulum, sapien eget lobortis
+fermentum, nisi leo malesuada nibh, tempor tincidunt leo nibh in elit. Mauris
+fermentum nunc sed pellentesque eleifend. Nunc eget libero eu elit placerat
+feugiat nec lacinia elit. Aenean ultrices lobortis ex eget gravida. Suspendisse
+in erat viverra, aliquam nulla a, gravida diam. Vivamus at viverra mauris. Mauris
+vitae mauris arcu. Proin eu erat odio.
+\pagebreak
+
+\addcontentsline{toc}{section}{\bibname}
+\printbibliography
+
+
+\printindex
+
+\end{document}
