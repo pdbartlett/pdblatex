@@ -4,7 +4,7 @@ from enum import Enum
 
 
 class DocMetaDataType(Enum):
-    Author, Date, Doctype, Docopts, H2Level, MathPkg, SecNumDepth, TocDepth = range(8)
+    Author, Date, DocType, DocOpts, H2Level, MathPkg, SecNumDepth, TocDepth = range(8)
 
 
 class GeneratedContentType(Enum):

@@ -6,7 +6,7 @@ __pycache__/
 
 # Pdblatex
 *.tex
-*.tmp.*
+*.tmp*.*
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

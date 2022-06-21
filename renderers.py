@@ -262,8 +262,8 @@ class IdiomaticRenderer(LaTeXRenderer):
         return (self.title or title,
                 self.metadata.get(DocMetaDataType.Author, AUTHOR),
                 self.metadata.get(DocMetaDataType.Date, date),
-                self.metadata.get(DocMetaDataType.Doctype, DOCTYPE),
-                self.metadata.get(DocMetaDataType.Docopts, DOCOPTS))
+                self.metadata.get(DocMetaDataType.DocType, DOCTYPE),
+                self.metadata.get(DocMetaDataType.DocOpts, DOCOPTS))
 
     def get_preamble(self):
         preamble = self.preamble
