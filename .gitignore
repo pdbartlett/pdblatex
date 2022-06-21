@@ -17,6 +17,7 @@ __pycache__/
 *.log
 *.lot
 *.fls
+*.mst
 *.out
 *.toc
 *.fmt
