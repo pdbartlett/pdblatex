@@ -236,7 +236,7 @@ class IdiomaticRenderer(LaTeXRenderer):
     def render_generated_content(self, token):
         if token.content == GeneratedContentType.BIBLIO.name:
             self.add_biblatex()
-            return '\\addcontentsline{toc}{section}{\\bibname}\n\\printbibliography\n'
+            return '\\printbibliography\n'
         if token.content == GeneratedContentType.FIGURES.name:
             return '\\listoffigures\n'
         if token.content == GeneratedContentType.INDEX.name:
@@ -246,7 +246,6 @@ class IdiomaticRenderer(LaTeXRenderer):
         if token.content == GeneratedContentType.TABLES.name:
             return '\\listoftables\n'
         if token.content == GeneratedContentType.TOC.name:
-            self.packages['tocbibind'] = '[section,nottoc,notbib]'
             return '\\tableofcontents\n'
 
     def get_doc_metadata(self):

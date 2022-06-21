@@ -1,7 +1,7 @@
 # Example Document
 [Author: Paul D. Bartlett]
 [Date: April 1, 2020]
-[DocType: minimart]
+[DocType: scrartcl]
 [Package: draftwatermark(text=TEST,scale=6)]
 
 ```bibTeX
