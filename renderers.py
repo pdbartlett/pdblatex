@@ -12,7 +12,8 @@ import mistletoe
 from mistletoe import Document
 from mistletoe.latex_renderer import LaTeXRenderer
 
-from enums import DocMetaDataType, GeneratedContentType, SpecialSectionType
+from enums import (DocMetaDataType, GeneratedContentType, SpecialSectionType,
+                   SpecialSectionPrefixType)
 from tokens import (ParenCite, TextCite, DocMetaData, DoubleQuote,
                     GeneratedContent, LatexLiteral, LatexPackageSimple,
                     LatexPackageWithOptions, MixedFraction, SimpleFraction,
@@ -51,6 +52,7 @@ class IdiomaticRenderer(LaTeXRenderer):
         self.title = ''
         self.abstract = ''
         self.para_is_abstract = False
+        self.next_caption = ''
         self.preamble = STD_PREAMBLE
         self.biblios = []
         self.metadata = {}
@@ -163,6 +165,11 @@ class IdiomaticRenderer(LaTeXRenderer):
                              SpecialSectionType.APPENDICES.name]:
             return '\n\\appendix\n'
 
+        prefix = SpecialSectionPrefixType.TABLE.name + ': '
+        if inner.upper().startswith(prefix):
+            self.next_caption = inner[len(prefix):]
+            return ''
+
         if token.level == 1:
             if self.title:
                 self.logger.warning(
@@ -182,8 +189,11 @@ class IdiomaticRenderer(LaTeXRenderer):
         return '\n\\{command}{{{inner}}}\n'.format(command=command, inner=inner)
 
     def render_table(self, token):
-        table = '\n\\begin{table}[h]\n'
+        table = '\n\\begin{table}[h]\n\\centering\n'
         table += super().render_table(token)
+        if self.next_caption:
+            table += '\\caption{{{}}}\n'.format(self.next_caption)
+            self.next_caption = ''
         table += '\\end{table}\n'
         return table
 

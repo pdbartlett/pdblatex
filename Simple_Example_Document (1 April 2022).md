@@ -1,4 +1,5 @@
 [TOC]
+[TABLES]
 
 ## Abstract
 
@@ -30,6 +31,8 @@ These are some very basic features that can be used:
 
 Here are a few more features, broken out separately mainly to demonstrate
 subsections, but it also gives a chance to show tables:
+
+#### Table: Example of a captioned table (so it appears in list)
 
 **Name** | **Description** | **Supported**
 ---------|-----------------|--------------
