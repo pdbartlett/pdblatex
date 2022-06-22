@@ -181,6 +181,12 @@ class IdiomaticRenderer(LaTeXRenderer):
             command = DOCLEVELS[-1]
         return '\n\\{command}{{{inner}}}\n'.format(command=command, inner=inner)
 
+    def render_table(self, token):
+        table = '\n\\begin{table}[h]\n'
+        table += super().render_table(token)
+        table += '\\end{table}\n'
+        return table
+
     @staticmethod
     def render_thematic_break(token):
         return '\\pagebreak\n'

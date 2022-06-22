@@ -29,7 +29,14 @@ These are some very basic features that can be used:
 ### Additional
 
 Here are a few more features, broken out separately mainly to demonstrate
-subsections, but it also gives a chance to show blockquotes:
+subsections, but it also gives a chance to show tables:
+
+**Name** | **Description** | **Supported**
+---------|-----------------|--------------
+Table    | Tables of data  | Yes
+Lists    | Lists of items  | Yes
+
+And blockquotes:
 
 > Blockquotes, like this one, can be used when  you need to add a sizeable
 > portion of text from a book, speech or other source, and format it so that it
@@ -37,11 +44,11 @@ subsections, but it also gives a chance to show blockquotes:
 
 It also provides an opportunity to see how subsequent paragraphs are formatted
 (they are indented rather than "skipping space", though this can be changed at
-a later date if it's preferable.
+a later date if it's preferable).
 
-It also goves a chances to show a different type of list. This one is
-bulleted---also known as unordered---as opposed to the numbered/ordered list used
-in the previous section.
+Finally it gives a chances to show a different type of list. This one is
+bulleted---also known as unordered---as opposed to the numbered/ordered list
+used in the previous section.
 
 * bulleted lists (like this one)
 * the different dashes: hyphens (e.g. side-effect), `en` dashes (e.g. 1--2 ideas),
