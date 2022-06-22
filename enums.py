@@ -16,4 +16,4 @@ class SpecialSectionType(Enum):
 
 
 class SpecialSectionPrefixType(Enum):
-    TABLE = 1
+    FIGURE, TABLE = range(2)

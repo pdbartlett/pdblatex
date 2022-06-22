@@ -1,4 +1,5 @@
 [TOC]
+[FIGURES]
 [TABLES]
 
 ## Abstract
@@ -38,6 +39,19 @@ subsections, but it also gives a chance to show tables:
 ---------|-----------------|--------------
 Table    | Tables of data  | Yes
 Lists    | Lists of items  | Yes
+
+Images, which like tables can be captioned. If so they can float to the most
+convenient place in the document to aid formatting, and appear in their
+respective lists. The first image example is uncaptioned so should appear
+immediately:
+
+![alt-text-not-used](cat.png)
+
+#### Figure: Twas a cat
+
+![alt-text-never-used](cat.png)
+
+![](cat.png "And another one")
 
 And blockquotes:
 

@@ -47,8 +47,9 @@ STD_PREAMBLE='''
 
 class IdiomaticRenderer(LaTeXRenderer):
     def __init__(self, path, *extras):
-        self.path = path
         self.logger = logging.getLogger(__name__)
+        self.logger.info('Renderer created')
+        self.path = path
         self.title = ''
         self.abstract = ''
         self.para_is_abstract = False
@@ -165,9 +166,12 @@ class IdiomaticRenderer(LaTeXRenderer):
                              SpecialSectionType.APPENDICES.name]:
             return '\n\\appendix\n'
 
-        prefix = SpecialSectionPrefixType.TABLE.name + ': '
-        if inner.upper().startswith(prefix):
-            self.next_caption = inner[len(prefix):]
+        prefices = [e.name for e in SpecialSectionPrefixType]
+        pattern = r'(' + '|'.join(prefices) + r'):\s*(.+)'
+        regex = re.compile(pattern, re.IGNORECASE)
+        match = regex.match(inner)
+        if match:
+            self.next_caption = match.group(2)
             return ''
 
         if token.level == 1:
@@ -187,6 +191,17 @@ class IdiomaticRenderer(LaTeXRenderer):
         else:
             command = DOCLEVELS[-1]
         return '\n\\{command}{{{inner}}}\n'.format(command=command, inner=inner)
+
+    def render_image(self, token):
+        basic = super().render_image(token)
+        caption = self.next_caption or token.title
+        self.next_caption = ''
+        if not caption:
+            return basic
+        figure = '\n\\begin{figure}[h]\n\\centering\n'
+        figure += basic
+        figure += '\\caption{{{}}}\n\\end{{figure}}\n'.format(caption)
+        return figure
 
     def render_table(self, token):
         table = '\n\\begin{table}[h]\n\\centering\n'

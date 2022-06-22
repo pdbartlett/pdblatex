@@ -18,7 +18,7 @@ class TextCite(SpanToken):
 class DocMetaData(SpanToken):
     names = [e.name for e in DocMetaDataType]
     pattern = re.compile(
-        r'\[(' + '|'.join(names) + ')\s*:\s*(.*)\]')
+        r'\[(' + '|'.join(names) + r')\s*:\s*(.*)\]')
     parse_inner = False
     def __init__(self, match):
         self.key = match.group(1)
@@ -32,7 +32,7 @@ class DoubleQuote(SpanToken):
 
 class GeneratedContent(SpanToken):
     names = [e.name for e in GeneratedContentType]
-    pattern = re.compile(r'\[(' + '|'.join(names) + ')\]')
+    pattern = re.compile(r'\[(' + '|'.join(names) + r')\]')
     parse_inner = False
 
 
