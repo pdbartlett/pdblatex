@@ -45,10 +45,10 @@ STD_PREAMBLE='''
 '''
 
 
-class IdiomaticRenderer(LaTeXRenderer):
+class LaTeXExtrasRenderer(LaTeXRenderer):
     def __init__(self, path, *extras):
         self.logger = logging.getLogger(__name__)
-        self.logger.info('Renderer created')
+        self.logger.info('LaTeXExtrasRenderer created')
         self.path = path
         self.title = ''
         self.abstract = ''
