@@ -193,15 +193,22 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
         return '\n\\{command}{{{inner}}}\n'.format(command=command, inner=inner)
 
     def render_image(self, token):
-        basic = super().render_image(token)
+        if token.src.endswith('.csv'):
+            self.packages['csvsimple'] = '[l3]'
+            basic = '\\csvautotabular{{{}}}\n'.format(token.src)
+            wrapper = 'table'
+        else:
+            basic = super().render_image(token)
+            wrapper = 'figure'
         caption = self.next_caption or token.title
         self.next_caption = ''
         if not caption:
-            return basic
-        figure = '\n\\begin{figure}[h]\n\\centering\n'
-        figure += basic
-        figure += '\\caption{{{}}}\n\\end{{figure}}\n'.format(caption)
-        return figure
+            return basic if wrapper == 'figure' else '\\medskip\n' + basic
+        wrapped = '\n\\begin{{{}}}[h]\n\\centering\n'.format(wrapper)
+        wrapped += basic
+        wrapped += '\\caption{{{}}}\n'.format(caption)
+        wrapped += '\\end{{{}}}\n'.format(wrapper)
+        return wrapped
 
     def render_table(self, token):
         table = '\n\\begin{table}[h]\n\\centering\n'
@@ -248,6 +255,13 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
             return self.render_raw_text(token.children[0], False)
         if token.language.lower() == 'preamblelatex':
             self.preamble += self.render_raw_text(token.children[0], False)
+            return ''
+        if token.language.lower().startswith('csv!'):
+            path = token.language[4:]
+            self.preamble
+            self.preamble += '\\begin{{filecontents*}}{{{}}}\n'.format(path)
+            self.preamble += self.render_raw_text(token.children[0], False)
+            self.preamble += '\\end{filecontents*}\n'
             return ''
         return super().render_block_code(token)
 

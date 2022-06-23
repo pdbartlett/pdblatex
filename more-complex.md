@@ -17,6 +17,12 @@
 	Year = {2001}}
 ```
 
+```csv!inline.tmp.csv
+Code,Description,Price,Count
+FOO,Foo widget,£1.23,45
+BAR,Bar doobrey,£6.78,90
+```
+
 ```preambleLaTex
 \def\BibTeX{{\textsc{Bib}\TeX}}
 ```
@@ -71,7 +77,10 @@ the inclusion of literal [[\LaTeX{}]] code:
 \end{align}
 ```
 
-Or [[\BibTeX{}]] for references; see below.
+Or [[\BibTeX{}]] for references; see below, and even CSV files which can be
+automatically rendered as a table:
+
+![](inline.tmp.csv)
 
 [BIBLIO]
 
