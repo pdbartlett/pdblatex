@@ -35,7 +35,7 @@ Once upon a time there was a document, which was written in Markdown.
 
 ## Features
 
-It contained **bold** text,  some *italics*, but this was just the start of what
+It contained **bold** text, some *italics*, but this was just the start of what
 was possible. For example, it could also do lists, tables, quotes, and many more
 things besides.
 

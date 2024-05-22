@@ -22,6 +22,8 @@ from tokens import (ParenCite, TextCite, DocMetaData, DoubleQuote,
 AUTHOR='Sophie Bartlett'
 DATE_FORMAT='%d %B %Y'
 DOCLEVELS=['part', 'chapter', 'section', 'subsection', 'subsubsection']
+SLIDELEVELS=['DUMMY', 'section', 'frametitle', 'framesubtitle']
+SLIDETYPES=['beamer']
 DOCOPTS='11pt,a4paper'
 DOCTYPE='article'
 H2_LEVEL='2'
@@ -32,8 +34,8 @@ PAREN_DATE_RE=re.compile(r'(.*) \((.*)\)')
 STD_PREAMBLE='''
 % Make title and author available
 \\makeatletter
-\\let\\inserttitle\@title
-\\let\\insertauthor\@author
+\\let\\inserttitle\\@title
+\\let\\insertauthor\\@author
 \\makeatother
 % Put title and author in header
 \\pagestyle{fancy}
@@ -54,10 +56,12 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
         self.abstract = ''
         self.para_is_abstract = False
         self.next_caption = ''
-        self.preamble = STD_PREAMBLE
+        self.preamble = ''
         self.biblios = []
         self.metadata = {}
         self.quote_open = False
+        self.is_slides = False
+        self.frame_open = False
         super().__init__(*chain([ParenCite, TextCite, DocMetaData, DoubleQuote,
                                  GeneratedContent, LatexLiteral,
                                  LatexPackageSimple, LatexPackageWithOptions,
@@ -85,6 +89,10 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
         # Also allows render_* methods to register packages to add.
         inner = self.render_inner(token)
 
+        # Close the last frame if one is open.
+        if self.frame_open:
+            inner += '\n\\end{frame}\n'
+
         template = ('\\documentclass[{docopts}]{{{doctype}}}\n'
                     '\\title{{{title}}}\n'
                     '\\author{{{author}}}\n'
@@ -92,7 +100,7 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
                     '{packages}'
                     '{preamble}'
                     '\\begin{{document}}\n'
-                    '\\maketitle\n'
+                    '{showtitle}'
                     '{abstract}'
                     '{inner}'
                     '\\end{{document}}\n')
@@ -101,6 +109,7 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
         preamble = self.get_preamble()
         # Do this last in case other calls add more.
         packages = self.render_packages()
+        showtitle = self.render_showtitle()
 
         return template.format(doctype=doctype,
                                docopts=docopts,
@@ -109,15 +118,18 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
                                date=date,
                                packages=packages,
                                preamble=preamble,
+                               showtitle=showtitle,
                                abstract=self.abstract,
                                inner=inner)
 
     def render_packages(self):
-        self.packages['fancyhdr'] = '' # Used in STD_PREAMBLE.
         mathpkg = self.metadata.get(DocMetaDataType.MathPkg, MATHPKG)
         if mathpkg.lower() != 'none':
             self.packages[mathpkg] = ''
         return super().render_packages()
+    
+    def render_showtitle(self):
+        return '\\begin{frame}\n\\titlepage\n\\end{frame}\n' if self.is_slides else '\\maketitle\n'
 
     def render_paren_cite(self, token):
         return self.cite_helper('parencite', token)
@@ -144,27 +156,28 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
     def render_heading(self, token):
         inner = self.render_inner(token)
 
-        if inner.upper() == SpecialSectionType.ABSTRACT.name:
-            self.para_is_abstract = True
-            self.abstract = '\\begin{abstract}\n'
-            return ''
+        if not self.is_slides:
+            if inner.upper() == SpecialSectionType.ABSTRACT.name:
+                self.para_is_abstract = True
+                self.abstract = '\\begin{abstract}\n'
+                return ''
 
-        if self.para_is_abstract:
-            self.para_is_abstract = False
-            self.abstract += '\\end{abstract}\n'
+            if self.para_is_abstract:
+                self.para_is_abstract = False
+                self.abstract += '\\end{abstract}\n'
 
-        if inner.upper() == SpecialSectionType.FRONTMATTER.name:
-            return '\n\\thispagestyle{empty}\n\\frontmatter\n'
+            if inner.upper() == SpecialSectionType.FRONTMATTER.name:
+                return '\n\\thispagestyle{empty}\n\\frontmatter\n'
 
-        if inner.upper() == SpecialSectionType.MAINMATTER.name:
-            return '\n\\mainmatter\n'
+            if inner.upper() == SpecialSectionType.MAINMATTER.name:
+                return '\n\\mainmatter\n'
 
-        if inner.upper() == SpecialSectionType.BACKMATTER.name:
-            return '\n\\backmatter\n'
+            if inner.upper() == SpecialSectionType.BACKMATTER.name:
+                return '\n\\backmatter\n'
 
-        if inner.upper() in [SpecialSectionType.APPENDIX.name,
-                             SpecialSectionType.APPENDICES.name]:
-            return '\n\\appendix\n'
+            if inner.upper() in [SpecialSectionType.APPENDIX.name,
+                                SpecialSectionType.APPENDICES.name]:
+                return '\n\\appendix\n'
 
         prefices = [e.name for e in SpecialSectionPrefixType]
         pattern = r'(' + '|'.join(prefices) + r'):\s*(.+)'
@@ -184,6 +197,24 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
 
         h2_level = int(self.metadata.get(DocMetaDataType.H2Level, H2_LEVEL))
         level = token.level + h2_level - 2
+
+        if self.is_slides:
+            if level < 0:
+                command = SLIDELEVELS[0]
+            elif level >= 0 and level < len(SLIDELEVELS):
+                command = SLIDELEVELS[level]
+            else:
+                command = SLIDELEVELS[-1]
+            buffer = ''
+            if self.frame_open and command != 'framesubtitle':
+                buffer += '\n\\end{frame}'
+                self.frame_open = False
+            if command=='frametitle':
+                buffer += '\n\\subsection{{{}}}\n\\begin{{frame}}'.format(inner)
+                self.frame_open = True
+            buffer += '\n\\{command}{{{inner}}}\n'.format(command=command, inner=inner)
+            return buffer
+
         if level < 0:
             command = DOCLEVELS[0]
         elif level >= 0 and level < len(DOCLEVELS):
@@ -224,6 +255,8 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
         return '\\pagebreak\n'
 
     def render_doc_meta_data(self, token):
+        if token.key == 'DocType' and token.val in SLIDETYPES:
+            self.is_slides = True
         self.metadata[DocMetaDataType[token.key]] = token.val
         return ''
 
@@ -270,13 +303,13 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
         return '${z}\\frac{{{n}}}{{{d}}}$'.format(z=token.whole,
                                                   n=token.numer, d=token.denom)
 
-    def render_simple_index_item(self, token):
-        self.packages['makeidx'] = ''
-        return '{i}\\index{{{i}}}'.format(i=token.content)
-
     @staticmethod
     def render_simple_fraction(token):
         return '$\\frac{{{n}}}{{{d}}}$'.format(n=token.numer, d=token.denom)
+
+    def render_simple_index_item(self, token):
+        self.packages['makeidx'] = ''
+        return '{i}\\index{{{i}}}'.format(i=token.content)
 
     def render_generated_content(self, token):
         if token.content == GeneratedContentType.BIBLIO.name:
@@ -310,7 +343,11 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
                 self.metadata.get(DocMetaDataType.DocOpts, DOCOPTS))
 
     def get_preamble(self):
-        preamble = self.preamble
+        preamble = ''
+        if not self.is_slides:
+            preamble = STD_PREAMBLE
+            self.packages['fancyhdr'] = '' # Used in STD_PREAMBLE.
+        preamble += self.preamble
         if 'SecNumDepth' in self.metadata:
             preamble += ('\\setcounter{secnumdepth}{' +
                 self.metadata[DocMetaDataType.SecNumDepth] + '}\n')
