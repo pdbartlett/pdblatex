@@ -343,17 +343,20 @@ class LaTeXExtrasRenderer(LaTeXRenderer):
                 self.metadata.get(DocMetaDataType.DocOpts, DOCOPTS))
 
     def get_preamble(self):
+        logging.info(self.metadata)
         preamble = ''
         if not self.is_slides:
             preamble = STD_PREAMBLE
             self.packages['fancyhdr'] = '' # Used in STD_PREAMBLE.
+        if DocMetaDataType.Theme in self.metadata:
+            preamble += '\\usetheme{{{}}}\n'.format(self.metadata[DocMetaDataType.Theme])
+        if DocMetaDataType.ColorTheme in self.metadata:
+            preamble += '\\usecolortheme{{{}}}\n'.format(self.metadata[DocMetaDataType.ColorTheme])
         preamble += self.preamble
-        if 'SecNumDepth' in self.metadata:
-            preamble += ('\\setcounter{secnumdepth}{' +
-                self.metadata[DocMetaDataType.SecNumDepth] + '}\n')
-        if 'TocDepth' in self.metadata:
-            preamble += ('\\setcounter{tocdepth}{' +
-                self.metadata[DocMetaDataType.TocDepth] + '}\n')
+        if DocMetaDataType.SecNumDepth in self.metadata:
+            preamble += '\\setcounter{{secnumdepth}}{{{}}}\n'.format(self.metadata[DocMetaDataType.SecNumDepth])
+        if DocMetaDataType.TocDepth in self.metadata:
+            preamble += '\\setcounter{{tocdepth}}{{{}}}\n'.format(self.metadata[DocMetaDataType.TocDepth])
         bibpath = self.newext('.bib')
         if os.path.isfile(bibpath):
             self.biblios.append(os.path.basename(bibpath))
